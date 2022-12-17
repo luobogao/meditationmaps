@@ -3,6 +3,8 @@ var sidebarWidth = 300
 var chartWidth = 800
 var chartHeight = 500
 var chartMargin = 30
+var x;
+var y;
 
 const fontFamily = "Roboto, sans-serif"
 const textSizeLarge = 25
@@ -169,7 +171,10 @@ function processMuseData(rows) {
     state.seconds_high = last_seconds
 
     // Data is ready for plotting
-    updateChart()
+    averageLowRes.forEach(entry => {
+        console.log(getRootVector(entry))
+    })
+    updateChartUser()
 
 
 }
@@ -191,7 +196,7 @@ function averageRows(rows, roundN) {
             let newRow = {}
             newRow.seconds = row.seconds
             newRow.minutes = row.minutes
-            newRow.vector_raw = getVector(row)
+            newRow.vector_raw = getRelativeVector(row)
 
             // Average each band + channel
             bands.forEach(band => {
@@ -225,7 +230,8 @@ function averageRows(rows, roundN) {
 
                 })
             })
-            newRow.vector = getVector(newRow) // Compute the averaged vector
+            newRow.vector = getRootVector(newRow) // Compute the averaged vector
+
             newRows.push(newRow)
 
         }
@@ -237,17 +243,38 @@ function updateChart() {
     var linkSize = 1
     var labelSize = "14px"
     var stateSize = 10
-    var svg = d3.select("#chart")
-    var data = state.highRes.map(e => e.vector)
+    d3.select("#chart").selectAll("*").remove() // Clear everything
+
+
+    let zoom = d3.zoom()
+        .on('zoom', handleZoom);
+
+    function handleZoom(e) {
+        // When user zooms, all chart "g" elements are changed accordingly
+        d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
+                   
+
+    }
+
+
+    // Add a series of "g" containers to the SVG in order of "elevation"
+    // This allows for future chart updates to act on shapes below these shapes
+    var svg_user = d3.select("#chart").append("g").attr("id", "chart_user")
+    var svg = d3.select("#chart").append("g").attr("id", "chart_labels")
+    var svg2 = d3.select("#chart").append("g").attr("id", "chart_standards")
+
+    d3.select("#chartsvg").call(zoom)
+
+
 
     var standards = Object.entries(standard_vectors).map(entry => entry[1])
 
     var standardCoordinates = standards.map(e => e.coordinates)
 
 
+    // Find the minimum and maxiumum range of the model, set the chart size a bit larger than those bounds
     var minx = d3.min(standardCoordinates.map(e => e[0]))
     var miny = d3.min(standardCoordinates.map(e => e[1]))
-
     var maxx = d3.max(standardCoordinates.map(e => e[0]))
     var maxy = d3.max(standardCoordinates.map(e => e[1]))
 
@@ -256,6 +283,7 @@ function updateChart() {
     miny = miny * 2
     maxy = maxy * 2
 
+    // These D3 functions return the properly scaled x and y coordinates
     x = d3.scalePow()
         .exponent(0.7)
         .domain([minx, maxx]) // input
@@ -270,7 +298,7 @@ function updateChart() {
 
 
     function add(xi, yi, size, color, opacity) {
-        svg.append("circle")
+        svg2.append("circle")
             .attr("cx", x(xi))
             .attr("cy", y(yi))
             .attr("r", size)
@@ -279,12 +307,23 @@ function updateChart() {
 
     }
 
+    standards.forEach(entry => {
+        var xi = entry.coordinates[0]
+        var yi = entry.coordinates[1]
+        add(xi, yi, stateSize, "blue", 1)
+
+    })
+
+
+
+    // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
+
     var label_array = []
     var anchor_array = []
     standards.forEach(entry => {
         var xi = entry.coordinates[0]
         var yi = entry.coordinates[1]
-        label_array.push({ x: x(xi), y: y(yi), width: 10, height: 4, name: entry.label })
+        label_array.push({ x: x(xi), y: y(yi), width: 10, height: 4, name: entry.user + " " + entry.label })
         anchor_array.push({ x: x(xi), y: y(yi), r: stateSize * 2 })
     })
     var labels = svg.selectAll(".label")
@@ -302,7 +341,7 @@ function updateChart() {
         .enter()
         .append("line")
         .attr("class", "link")
-        .attr("opacity", 0.3)
+        .attr("opacity", 0.2)
         .attr("x1", function (d) { return (d.x); })
         .attr("y1", function (d) { return (d.y); })
         .attr("x2", function (d) { return (d.x); })
@@ -318,7 +357,7 @@ function updateChart() {
 
     })
 
-
+    // Use d3-labeler library to move each label so that it doesn't overlap
     d3.labeler()
         .label(label_array)
         .anchor(anchor_array)
@@ -336,26 +375,56 @@ function updateChart() {
     links
         .transition()
         .duration(800)
-        .attr("x2", function (d) { return d.x ; })
+        .attr("x2", function (d) { return d.x; })
         .attr("y2", function (d) { return d.y - 2; });
 
-    standards.forEach(entry => {
-        var xi = entry.coordinates[0]
-        var yi = entry.coordinates[1]
-        add(xi, yi, stateSize, "blue", 1)
-    
-    })
+
+
 
 
 
 
 }
 
+
+function updateChartUser() {
+
+    var svg = d3.select("#chart_user")
+    svg.selectAll("*").remove() // Clear last chart, if any
+
+    var data = state.highRes.map(e => getRelativeVector(e.vector))
+
+    var mapped = runModel(data, state.model.principals, state.model.means)
+    var fulldata = state.highRes
+    var index = 0
+    mapped.forEach(entry => {
+
+        var second = fulldata[index].seconds
+        svg.append("circle")
+            .attr("cx", x(entry[0]))
+            .attr("cy", y(entry[1]))
+            .attr("r", 10)
+            .attr("opacity", 0.1)
+            .attr("fill", "black")
+            .on("mouseover", function(d){
+                console.log(second)
+            })
+
+        index ++            
+            
+    })
+
+
+}
+
 function buildModel() {
-    var data = Object.entries(standard_vectors).map(e => e[1].vector)
-    var principals = pca(data)
+    var data = Object.entries(standard_vectors).map(e => getRelativeVector(e[1].vector))
+    var pca_data = pca(data)
+    var principals = pca_data[0]
+    var means = pca_data[1]
     state.model.principals = principals
-    var model = runModel(data, principals)
+    state.model.means = means
+    var model = runModel(data, principals, means)
 
     // Store these mapped coorindate in each standard's entry 
     var keys = Object.keys(standard_vectors)
@@ -391,6 +460,7 @@ function buildChart() {
 
 
 }
-window.addEventListener("scroll", window.scrollTo(0, 0));  
+updateChart()
+
 
 
