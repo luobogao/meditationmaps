@@ -7,7 +7,7 @@ const textSizeSmall = 12
 
 function receivedFile()
 {
-    d3.select ("#save-btn").style("display", "flex") 
+
     console.log ("REVEIVED DATA")
     let string = fr.result
     let data = d3.csvParse (string)
@@ -18,4 +18,4 @@ function receivedFile()
 
 }
 
-buildBrowseFile(d3.select("#main"), "test", "t1")
+buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")

@@ -13,12 +13,13 @@ function openNav() {
   }
 function buildBrowseFile (div, label, id)
 {
+    var width= "80px"
     let holder = div.append ("div")
         .style ("position", "relative")
         .attr ("font-family", fontFamily)
         .attr ("font-size", textSizeMed + "px")
         .attr ("id", id + "-all")
-        .style ("width", "150px")
+        .style ("width", width)
 
     holder
         .append ("input")
@@ -27,7 +28,7 @@ function buildBrowseFile (div, label, id)
         .style ("opacity", 0)
         .style ("z-index", 2)
         .attr ("class", "browse-id")
-        .style ("width", "150px")
+        .style ("width", width)
         .attr ("type", "file")
         .on ("mouseover", function(d) {
             d3.select(this).style("cursor", "pointer");

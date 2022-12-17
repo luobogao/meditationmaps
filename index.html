@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
-
-<link rel="stylesheet" type="text/css" href="https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.css" />
 <script src="js/d3.min.js" charset="utf-8"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin">
 
-<body style="background: #444654ff; height=100vw">
+<body style="height:100vw">
 
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
@@ -16,9 +14,13 @@
       </div>
       
       <div id="main">
-        <button id="open_btn" class="openbtn" onclick="openNav()">☰ Open Sidebar</button>  
-        <h2>Meditation Maps</h2>
-        <p>Upload a Muse CSV to see your meditation journey through mind-space</p>
+        <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>              
+        <h2 style="text-align: center;">Meditation Maps</h2>
+        <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
+        
+        <div id="browse-div" style="display: flex; justify-content: center;">
+                
+        </div>
       </div>
 </body>
 <script src="js/ui.js"></script>
