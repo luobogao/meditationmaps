@@ -1,8 +1,25 @@
 
+var sidebarWidth = 300
+var chartWidth = 800
+var chartHeight = 500
+var chartMargin = 30
+
 const fontFamily = "Roboto, sans-serif"
 const textSizeLarge = 25
 const textSizeMed = 18
 const textSizeSmall = 12
+const channels = ["TP9", "TP10", "AF7", "AF8"]
+const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+const rl_pairs = [["TP10", "TP9"], ["AF8", "AF7"]]
+const fb_pairs = [["TP9", "AF7"], ["TP10", "AF8"]]
+
+const band_channels = []
+bands.forEach(band => {
+    channels.forEach(channel => {
+        band_channels.push(band + "_" + channel)
+    })
+})
+
 
 var state =
 {
@@ -16,7 +33,7 @@ var state =
 
 function receivedFile() {
 
-    console.log("REVEIVED DATA")
+
     let string = fr.result
     let data = d3.csvParse(string)
     let headers = data.slice(-1)[0]
@@ -26,7 +43,7 @@ function receivedFile() {
 
 
 }
-function processMuseData(csv) {
+function processMuseData(rows) {
     // Remove rows with blank data
     rows = rows.filter(row => row.Delta_TP9 || row.Theta_AF8 || row.Beta_AF7 || row.Gamma_TP10) // remove blank rows
 
@@ -99,6 +116,7 @@ function processMuseData(csv) {
             var variance = d3.variance(avgArray)
             rows[i][col + "_variance"] = variance
 
+            // Variance from motion is too high - flag this row for removal in next step
             if (variance > motion_variance_max) {
 
                 rows[i].moving = true
@@ -109,10 +127,11 @@ function processMuseData(csv) {
 
     }
     // remove rows with too much motion
-    rows = rows.filter(e => e.moving).length
+    rows = rows.filter(e => e.moving != true)
 
     // Remove last 10 seconds and first 10 seconds - user is probably moving during this time
     rows = rows.slice(10, rows.length - 10)
+    console.log("Validated rows: " + rows.length)
 
     let last_timestamp = parseTime(rows.slice(-1)[0].TimeStamp)
     let total_seconds = Math.round((last_timestamp - first_timestamp) / 1000)
@@ -128,30 +147,41 @@ function processMuseData(csv) {
     var lowResolution = 60   // average over 60 seconds
     var highResolution = 10  // average over 10 seconds
 
+    // Long duration meditations should using longer rounding
     if (total_hours > 0.8) {
-        // Long file, using longer rounding   
+
     }
 
+    // Perform two different rounding operations with different average N
     let averageHighRes = averageRows(clone(standardRows), highResolution)
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
 
-    if (averageLowRes.length < 5) {
-        alert("Meditation session was too short!")
+    if (averageLowRes.length < 3) {
+        alert("Meditation session was too short: " + averageLowRes.length + " minutes")
     }
     state.lowRes = averageLowRes
     state.highRes = averageHighRes
+
+    // Find the first and last timestamp for timeseries chart x-axis
     const first_seconds = standardRows[0].seconds
     const last_seconds = standardRows.slice(-1)[0].seconds
     state.seconds_low = first_seconds
     state.seconds_high = last_seconds
+
+    // Data is ready for plotting
     updateChart()
 
 
 }
 
-buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")
+
 
 function averageRows(rows, roundN) {
+
+    const channels = ["TP9", "TP10", "AF7", "AF8"]
+    const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+
+
     roundN = Math.round(roundN)
     const roundN_half = Math.round(roundN / 2)
     let newRows = []
@@ -161,13 +191,163 @@ function averageRows(rows, roundN) {
             let newRow = {}
             newRow.seconds = row.seconds
             newRow.minutes = row.minutes
-            newRow.vector = getVector(row)
+            newRow.vector_raw = getVector(row)
+
+            // Average each band + channel
+            bands.forEach(band => {
+                channels.forEach(channel => {
+                    let avgArray = []
+                    const key = band + "_" + channel // "Gamma_TP10"
+
+                    for (let a = i - roundN_half; a < i + roundN_half; a++) {
+                        var row = rows[a]
+
+                        let val = row[key]
+                        if (!isNaN(val)) {
+                            avgArray.push(val)
+                        }
+
+                    }
+                    // If there are not enough valid values for an average, return NaN
+                    if (avgArray.length > roundN_half) {
+                        let avg = round(d3.quantile(avgArray, 0.5))
+                        let max = round(d3.quantile(avgArray, 0.95))
+                        let min = round(d3.quantile(avgArray, 0.05))
+                        newRow[key] = avg
+                        newRow[key + "_min"] = min
+                        newRow[key + "_max"] = max
+
+                    }
+                    else {
+
+                        newRow[key] = NaN
+                    }
+
+                })
+            })
+            newRow.vector = getVector(newRow) // Compute the averaged vector
+            newRows.push(newRow)
 
         }
     }
+    return newRows
 }
 
 function updateChart() {
+    var linkSize = 1
+    var labelSize = "14px"
+    var stateSize = 10
+    var svg = d3.select("#chart")
+    var data = state.highRes.map(e => e.vector)
+
+    var standards = Object.entries(standard_vectors).map(entry => entry[1])
+
+    var standardCoordinates = standards.map(e => e.coordinates)
+
+
+    var minx = d3.min(standardCoordinates.map(e => e[0]))
+    var miny = d3.min(standardCoordinates.map(e => e[1]))
+
+    var maxx = d3.max(standardCoordinates.map(e => e[0]))
+    var maxy = d3.max(standardCoordinates.map(e => e[1]))
+
+    minx = minx * 2
+    maxx = maxx * 2
+    miny = miny * 2
+    maxy = maxy * 2
+
+    x = d3.scalePow()
+        .exponent(0.7)
+        .domain([minx, maxx]) // input
+        //.domain ([-500, 1000])
+        .range([0, chartWidth]); // output
+
+    y = d3.scalePow()
+        .exponent(0.7)
+        .domain([miny, maxy])
+        //.domain ([-500, 500])
+        .range([chartHeight, 0])
+
+
+    function add(xi, yi, size, color, opacity) {
+        svg.append("circle")
+            .attr("cx", x(xi))
+            .attr("cy", y(yi))
+            .attr("r", size)
+            .attr("opacity", opacity)
+            .attr("fill", color)
+
+    }
+
+    var label_array = []
+    var anchor_array = []
+    standards.forEach(entry => {
+        var xi = entry.coordinates[0]
+        var yi = entry.coordinates[1]
+        label_array.push({ x: x(xi), y: y(yi), width: 10, height: 4, name: entry.label })
+        anchor_array.push({ x: x(xi), y: y(yi), r: stateSize * 2 })
+    })
+    var labels = svg.selectAll(".label")
+        .data(label_array)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .style("font-size", labelSize)
+        .attr("x", function (d) { return d.x })
+        .attr("y", function (d) { return d.y })
+        .text(function (d) { return d.name })
+
+    var links = svg.selectAll(".link")
+        .data(label_array)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("opacity", 0.3)
+        .attr("x1", function (d) { return (d.x); })
+        .attr("y1", function (d) { return (d.y); })
+        .attr("x2", function (d) { return (d.x); })
+        .attr("y2", function (d) { return (d.y); })
+        .attr("stroke-width", linkSize)
+        .attr("stroke", "black");
+
+    var index = 0
+    labels.each(function () {
+        label_array[index].width = this.getBBox().width;
+        label_array[index].height = this.getBBox().height;
+        index++
+
+    })
+
+
+    d3.labeler()
+        .label(label_array)
+        .anchor(anchor_array)
+        .width(chartWidth)
+        .height(chartHeight)
+        .start(1000)
+
+
+    labels
+        .transition()
+        .duration(1000)
+        .attr("x", function (d) { return d.x })
+        .attr("y", function (d) { return d.y })
+
+    links
+        .transition()
+        .duration(800)
+        .attr("x2", function (d) { return d.x ; })
+        .attr("y2", function (d) { return d.y - 2; });
+
+    standards.forEach(entry => {
+        var xi = entry.coordinates[0]
+        var yi = entry.coordinates[1]
+        add(xi, yi, stateSize, "blue", 1)
+    
+    })
+
+
+
 
 }
 
@@ -176,7 +356,7 @@ function buildModel() {
     var principals = pca(data)
     state.model.principals = principals
     var model = runModel(data, principals)
-    
+
     // Store these mapped coorindate in each standard's entry 
     var keys = Object.keys(standard_vectors)
     for (var c = 0; c < keys.length; c++) {
@@ -185,6 +365,32 @@ function buildModel() {
         standard_vectors[key].coordinates = coord
 
     }
-    
+
 }
+
+// Add the "browse" button
+buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")
+
+// Build model of meditation states using the "vectors.js" file
 buildModel()
+buildChart()
+function buildChart() {
+    d3.select("#main").style("position", "absolute").style("top", 0).style("left", 0)
+
+    chartWidth = window.innerWidth - sidebarWidth
+    chartHeight = window.innerHeight
+    var svg = d3.select("#chartsvg")
+        .attr("width", chartWidth + (2 * chartMargin))
+        .attr("height", chartHeight + (2 * chartMargin))
+        .style("background-color", "grey")
+        .append("g")
+        .attr("id", "chart")
+        .attr("width", chartWidth)
+        .attr("height", chartHeight)
+        .attr("transform", "translate(" + chartMargin + "," + chartMargin + ")")
+
+
+}
+window.addEventListener("scroll", window.scrollTo(0, 0));  
+
+

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <script src="libraries/d3.min.js" charset="utf-8"></script>
+<script src="libraries/labeler.js" charset="utf-8"></script>
 <script src="libraries/moment.min.js" charset="utf-8"></script>
 <script src="libraries/math.js" charset="utf-8"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -9,24 +11,21 @@
 <body style="height:100vw">
 
     <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="#">Tutorial</a>
-        <a  onclick="clickDiscord()">Discord Group</a>
+        <h2 style="text-align: center;">Meditation Maps</h2>
+        <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
+        <div id="browse-div" style="display: flex; justify-content: center;"></div>
+        <div id="options" style="margin-top: 50px;"><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+            <a href="#">Tutorial</a>
+            <a  onclick="clickDiscord()">Discord Group</a></div>
+        
+        <p style="margin-top: 100px; opacity: 0.5; text-align:center; font-size:10px">Our goal is to collect meditation data from many experienced practitioners and make it freely available and useful to anyone interested in pursuing meditation</p>
         
       </div>
       
       <div id="main">
         <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>              
-        <h2 style="text-align: center;">Meditation Maps</h2>
-        <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
-
-        
-        
-        <div id="browse-div" style="display: flex; justify-content: center;">
+        <svg id="chartsvg"></svg>
             
-                
-        </div>
-        <p style="margin-top: 100px; opacity: 0.5; text-align:center">Our goal is to collect meditation data from many experienced practitioners and make it freely available and useful to anyone interested in pursuing meditation</p>
       </div>
 </body>
 <script src="js/vectors.js"></script>

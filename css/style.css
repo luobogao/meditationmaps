@@ -8,7 +8,7 @@ body{
 }
 .sidebar {
   height: 100%;
-  width: 250px;
+  width: 300px;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -42,7 +42,7 @@ body{
 #main {
   transition: margin-left .5s;
   height: 100vw;
-  margin-left: 250px;
+  margin-left: 300px;
   background-image: url('../assets/map_image.png');
 }
 

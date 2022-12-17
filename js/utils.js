@@ -31,3 +31,16 @@ function clone(obj)
 {
     return JSON.parse(JSON.stringify(obj))
 }
+var getRandomStr = function(){
+    var randomStrLength = Math.floor(Math.random() * 10) + 5,
+    pool = 'abcdefghijklmnopqrstuvwxyz1234567890',
+    randomStr = '';
+    
+    var pl = pool.length
+    for (var i = 0; i < randomStrLength; i++) {
+         var randomChar = pool.substr(Math.floor(Math.random() * pl), 1);
+         randomStr += randomChar;     
+    }
+    
+    return randomStr;
+}
