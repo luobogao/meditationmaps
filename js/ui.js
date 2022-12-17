@@ -1,5 +1,13 @@
 
 
+function clickDiscord()
+{
+    
+    window.open(
+        "https://discord.gg/FQEthg67",
+        '_blank' // <- This is what makes it open in a new window.
+    );
+}
 function openNav() {
     document.getElementById("mySidebar").style.width = "250px";
     document.getElementById("open_btn").style.display = "none"
