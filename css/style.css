@@ -43,7 +43,7 @@ body{
   transition: margin-left .5s;
   height: 100vw;
   margin-left: 300px;
-  background-image: url('../assets/map_image.png');
+  /* background-image: url('../assets/map_image.png');
 }
 
 

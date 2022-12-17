@@ -444,10 +444,20 @@ buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")
 buildModel()
 buildChart()
 function buildChart() {
-    d3.select("#main").style("position", "absolute").style("top", 0).style("left", 0)
 
+    // Set full screen
     chartWidth = window.innerWidth - sidebarWidth
     chartHeight = window.innerHeight
+    
+    // Check if user is on a phone
+    if (navigator.userAgent.match(/Android/i) ||    navigator.userAgent.match(/iPhone/i))
+    {
+        closeNav()    
+        chartWidth = 360
+    }
+    d3.select("#main").style("position", "absolute").style("top", 0).style("left", 0)
+
+    
     var svg = d3.select("#chartsvg")
         .attr("width", chartWidth + (2 * chartMargin))
         .attr("height", chartHeight + (2 * chartMargin))
