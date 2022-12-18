@@ -9,15 +9,17 @@ function clickDiscord()
     );
 }
 function openNav() {
-    document.getElementById("mySidebar").style.width = "250px";
+    document.getElementById("mySidebar").style.left = "0px";
     document.getElementById("open_btn").style.display = "none"
-    document.getElementById("main").style.marginLeft = "250px";
+    document.getElementById("main").style.marginLeft = "300px";
+    d3.select("#chartsvg").attr("width", window.innerWidth - 300)
   }
   
   function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("mySidebar").style.left = "-300px";
     document.getElementById("open_btn").style.display = "flex"
     document.getElementById("main").style.marginLeft= "0";
+    d3.select("#chartsvg").attr("width", window.innerWidth)
   }
 function buildBrowseFile (div, label, id)
 {

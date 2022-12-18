@@ -90,6 +90,38 @@ var standard_vectors =
             
     
         },
+        "similarity_kaio_fruition":
+        {
+            "label": "Fruition",
+            "color": "orange",
+            "user": "Kaio",
+            "vector":         {
+                "Delta_TP9": 0.8983,
+                "Theta_TP9": 2.1087,
+                "Alpha_TP9": 7.1339,
+                "Beta_TP9": 2.248,
+                "Gamma_TP9": 2.0346,
+                "Delta_TP10": 0.7555,
+                "Theta_TP10": 1.9615,
+                "Alpha_TP10": 6.8535,
+                "Beta_TP10": 2.4345,
+                "Gamma_TP10": 2.0109,
+                "Delta_AF7": 6.523,
+                "Theta_AF7": 6.1074,
+                "Alpha_AF7": 6.936,
+                "Beta_AF7": 5.0924,
+                "Gamma_AF7": 2.6578,
+                "Delta_AF8": 1.1437,
+                "Theta_AF8": 0.8041,
+                "Alpha_AF8": 0.6695,
+                "Beta_AF8": 1.9594,
+                "Gamma_AF8": 1.3774
+              }
+    
+            
+    
+        },
+
 
         "similarity_nii_selfinquiry":
         {

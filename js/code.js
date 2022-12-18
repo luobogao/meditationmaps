@@ -399,7 +399,7 @@ function updateChartUser() {
     var index = 0
     mapped.forEach(entry => {
 
-        var second = fulldata[index].seconds
+        var moment = fulldata[index]
         svg.append("circle")
             .attr("cx", x(entry[0]))
             .attr("cy", y(entry[1]))
@@ -407,7 +407,17 @@ function updateChartUser() {
             .attr("opacity", 0.1)
             .attr("fill", "black")
             .on("mouseover", function(d){
-                console.log(second)
+                d3.select(this).style("opacity", 1)
+                //console.log(moment.vector)
+                console.log(moment.Gamma_AF7)
+                
+            })
+            .on("click", function(d)
+            {
+                console.log(moment.vector)
+            })
+            .on("mouseout", function(d){
+                d3.select(this).style("opacity", 0.1)
             })
 
         index ++            
@@ -456,7 +466,7 @@ function buildChart() {
         chartWidth = 360
     }
     d3.select("#main").style("position", "absolute").style("top", 0).style("left", 0)
-
+    d3.select("#open_btn").style("position", "absolute").style("top", "10px").style("left", "10px")
     
     var svg = d3.select("#chartsvg")
         .attr("width", chartWidth + (2 * chartMargin))
