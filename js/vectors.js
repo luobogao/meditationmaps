@@ -1,6 +1,32 @@
 var standard_vectors = 
     {
-
+        "similarity_don_best":
+        {
+            "label": "Strongest",
+            "user": "Lance",
+            "vector": {
+                "Delta_TP9": 1.4707,
+                "Theta_TP9": 4.0284,
+                "Alpha_TP9": 10.7014,
+                "Beta_TP9": 4.9742,
+                "Gamma_TP9": 2.5407,
+                "Delta_TP10": 1.4286,
+                "Theta_TP10": 6.8658,
+                "Alpha_TP10": 18.2472,
+                "Beta_TP10": 3.0313,
+                "Gamma_TP10": 1.2753,
+                "Delta_AF7": 0.5468,
+                "Theta_AF7": 0.5507,
+                "Alpha_AF7": 1.5176,
+                "Beta_AF7": 1.0541,
+                "Gamma_AF7": 0.5478,
+                "Delta_AF8": 0.7604,
+                "Theta_AF8": 0.5714,
+                "Alpha_AF8": 1.0216,
+                "Beta_AF8": 0.9514,
+                "Gamma_AF8": 0.4379
+              }
+        },
         "similarity_don_lfm":
         {
             "label": "Long-Form",
@@ -60,6 +86,35 @@ var standard_vectors =
               }
     
         },
+        "similarity_stephen":
+        {
+            "label": "Mantra",
+            "user": "Stephen",
+            "vector": {
+                "Delta_TP9": 0.7285,
+                "Theta_TP9": 0.9326,
+                "Alpha_TP9": 5.1735,
+                "Beta_TP9": 1.4373,
+                "Gamma_TP9": 0.5841,
+                "Delta_TP10": 0.7587,
+                "Theta_TP10": 0.8373,
+                "Alpha_TP10": 4.6493,
+                "Beta_TP10": 1.6444,
+                "Gamma_TP10": 0.5726,
+                "Delta_AF7": 0.6379,
+                "Theta_AF7": 0.4022,
+                "Alpha_AF7": 1.0903,
+                "Beta_AF7": 0.9648,
+                "Gamma_AF7": 0.8728,
+                "Delta_AF8": 0.4827,
+                "Theta_AF8": 0.4573,
+                "Alpha_AF8": 1.1671,
+                "Beta_AF8": 0.9768,
+                "Gamma_AF8": 0.5445
+              }
+        },
+
+
         "similarity_kaio_insight":
         {
             "label": "Insight",

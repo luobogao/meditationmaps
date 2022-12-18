@@ -57,7 +57,8 @@ function buildBrowseFile (div, label, id)
 
         .on ("change", function (evt){
             document.getElementById (id).click ()
-            
+            d3.select("#chart_user").selectAll("*").remove() // Clear last chart, if any
+
             let file = evt.target.files [0]
 
             fr = new FileReader ()

@@ -157,12 +157,14 @@ function processMuseData(rows) {
     // Perform two different rounding operations with different average N
     let averageHighRes = averageRows(clone(standardRows), highResolution)
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
+    let average10 = averageRows(clone(standardRows), standardRows.length / 10)
 
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
     }
     state.lowRes = averageLowRes
     state.highRes = averageHighRes
+    state.avg10 = average10
 
     // Find the first and last timestamp for timeseries chart x-axis
     const first_seconds = standardRows[0].seconds
@@ -172,9 +174,10 @@ function processMuseData(rows) {
 
     // Data is ready for plotting
     averageLowRes.forEach(entry => {
-        console.log(getRootVector(entry))
+        //console.log(getRootVector(entry)) show all vectors
     })
-    updateChartUser()
+    updateChartUser(state.highRes, "small")
+    updateChartUser(state.avg10, "large")
 
 
 }
@@ -252,7 +255,7 @@ function updateChart() {
     function handleZoom(e) {
         // When user zooms, all chart "g" elements are changed accordingly
         d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
-                   
+
 
     }
 
@@ -387,45 +390,90 @@ function updateChart() {
 }
 
 
-function updateChartUser() {
+function updateChartUser(data, type) {
+
+    var userSize = 25
+    var userOpacity = 0.02
+    if (type == "large")
+    {
+        userSize = 5
+        userOpacity = 0.9
+    } 
+
 
     var svg = d3.select("#chart_user")
     svg.selectAll("*").remove() // Clear last chart, if any
 
-    var data = state.highRes.map(e => getRelativeVector(e.vector))
+    var vectors = data.map(e => getRelativeVector(e.vector))
 
-    var mapped = runModel(data, state.model.principals, state.model.means)
-    var fulldata = state.highRes
+    var mapped = runModel(vectors, state.model.principals, state.model.means)
+
     var index = 0
+
+    var lineData = []
+
+
+
     mapped.forEach(entry => {
 
-        var moment = fulldata[index]
-        svg.append("circle")
-            .attr("cx", x(entry[0]))
-            .attr("cy", y(entry[1]))
-            .attr("r", 10)
-            .attr("opacity", 0.1)
-            .attr("fill", "black")
-            .on("mouseover", function(d){
-                d3.select(this).style("opacity", 1)
-                //console.log(moment.vector)
-                console.log(moment.Gamma_AF7)
-                
-            })
-            .on("click", function(d)
-            {
-                console.log(moment.vector)
-            })
-            .on("mouseout", function(d){
-                d3.select(this).style("opacity", 0.1)
-            })
 
-        index ++            
-            
+        var moment = data[index]
+        var xi = x(entry[0])
+        var yi = y(entry[1])
+
+        lineData.push([xi, yi])
+
+        setTimeout(function () {
+            svg.append("circle")
+                .attr("cx", xi)
+                .attr("cy", yi)
+                .attr("r", userSize)
+                .attr("opacity", userOpacity)
+                .attr("fill", "black")
+                .on("mouseover", function (d) {
+                    d3.select(this).style("opacity", 0.9)
+                    //console.log(moment.vector)
+                    console.log(moment.Gamma_AF7)
+
+                })
+                .on("click", function (d) {
+                    console.log(moment.vector)
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this).style("opacity", userOpacity)
+                })
+
+
+
+        }, index * (1000 / mapped.length))
+
+        index++
+
     })
+
+    if (type == "large") {
+        setTimeout(function()
+        {
+            svg.append("path")
+            .attr("fill", "none")
+            .attr("stroke", "black")
+            .attr("d", function () { return line(lineData) })
+        }, 1000)
+        
+    }
+
+
 
 
 }
+var line = d3.line()
+    .x(function (d, i) { return d[0]; })
+    .y(function (d, i) {
+        return d[1]
+
+    })
+    .curve(d3.curveMonotoneX) // apply smoothing to the line
+
 
 function buildModel() {
     var data = Object.entries(standard_vectors).map(e => getRelativeVector(e[1].vector))
@@ -458,16 +506,15 @@ function buildChart() {
     // Set full screen
     chartWidth = window.innerWidth - sidebarWidth
     chartHeight = window.innerHeight
-    
+
     // Check if user is on a phone
-    if (navigator.userAgent.match(/Android/i) ||    navigator.userAgent.match(/iPhone/i))
-    {
-        closeNav()    
+    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
+        closeNav()
         chartWidth = 360
     }
     d3.select("#main").style("position", "absolute").style("top", 0).style("left", 0)
     d3.select("#open_btn").style("position", "absolute").style("top", "10px").style("left", "10px")
-    
+
     var svg = d3.select("#chartsvg")
         .attr("width", chartWidth + (2 * chartMargin))
         .attr("height", chartHeight + (2 * chartMargin))
