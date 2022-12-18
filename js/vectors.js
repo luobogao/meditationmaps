@@ -1,293 +1,311 @@
-var standard_vectors = 
+var waypoints =
+[
     {
-        "similarity_don_best":
-        {
-            "label": "Strongest",
-            "user": "Lance",
-            "vector": {
-                "Delta_TP9": 1.4707,
-                "Theta_TP9": 4.0284,
-                "Alpha_TP9": 10.7014,
-                "Beta_TP9": 4.9742,
-                "Gamma_TP9": 2.5407,
-                "Delta_TP10": 1.4286,
-                "Theta_TP10": 6.8658,
-                "Alpha_TP10": 18.2472,
-                "Beta_TP10": 3.0313,
-                "Gamma_TP10": 1.2753,
-                "Delta_AF7": 0.5468,
-                "Theta_AF7": 0.5507,
-                "Alpha_AF7": 1.5176,
-                "Beta_AF7": 1.0541,
-                "Gamma_AF7": 0.5478,
-                "Delta_AF8": 0.7604,
-                "Theta_AF8": 0.5714,
-                "Alpha_AF8": 1.0216,
-                "Beta_AF8": 0.9514,
-                "Gamma_AF8": 0.4379
-              }
-        },
-        "similarity_don_lfm":
-        {
-            "label": "Long-Form",
-            "color": "orange",
-            "user": "Lance",
-            "vector": {
-                "Delta_TP9": 1.3878,
-                "Theta_TP9": 4.1017,
-                "Alpha_TP9": 11.7277,
-                "Beta_TP9": 2.4031,
-                "Gamma_TP9": 0.6464,
-                "Delta_TP10": 1.5538,
-                "Theta_TP10": 8.8229,
-                "Alpha_TP10": 23.545,
-                "Beta_TP10": 3.2146,
-                "Gamma_TP10": 0.8345,
-                "Delta_AF7": 0.4875,
-                "Theta_AF7": 0.5954,
-                "Alpha_AF7": 1.3402,
-                "Beta_AF7": 0.8758,
-                "Gamma_AF7": 0.3521,
-                "Delta_AF8": 0.5522,
-                "Theta_AF8": 0.5484,
-                "Alpha_AF8": 1.3396,
-                "Beta_AF8": 0.8513,
-                "Gamma_AF8": 0.3215
-              }
-        },
-
-        "similarity_don_notmeditating":
-        {
-            "label": "Not Meditating",
-            "color": "orange",
-            "user": "Lance",
-            "vector": 
-            {
-                "Delta_TP9": 1.856,
-                "Theta_TP9": 3.7439,
-                "Alpha_TP9": 10.5043,
-                "Beta_TP9": 2.2541,
-                "Gamma_TP9": 0.4103,
-                "Delta_TP10": 1.7338,
-                "Theta_TP10": 7.8816,
-                "Alpha_TP10": 22.5911,
-                "Beta_TP10": 2.6198,
-                "Gamma_TP10": 0.4039,
-                "Delta_AF7": 0.5234,
-                "Theta_AF7": 0.619,
-                "Alpha_AF7": 1.3042,
-                "Beta_AF7": 0.8806,
-                "Gamma_AF7": 0.3087,
-                "Delta_AF8": 0.663,
-                "Theta_AF8": 0.6411,
-                "Alpha_AF8": 1.5213,
-                "Beta_AF8": 0.7334,
-                "Gamma_AF8": 0.2379
-              }
-    
-        },
-        "similarity_stephen":
-        {
-            "label": "Mantra",
-            "user": "Stephen",
-            "vector": {
-                "Delta_TP9": 0.7285,
-                "Theta_TP9": 0.9326,
-                "Alpha_TP9": 5.1735,
-                "Beta_TP9": 1.4373,
-                "Gamma_TP9": 0.5841,
-                "Delta_TP10": 0.7587,
-                "Theta_TP10": 0.8373,
-                "Alpha_TP10": 4.6493,
-                "Beta_TP10": 1.6444,
-                "Gamma_TP10": 0.5726,
-                "Delta_AF7": 0.6379,
-                "Theta_AF7": 0.4022,
-                "Alpha_AF7": 1.0903,
-                "Beta_AF7": 0.9648,
-                "Gamma_AF7": 0.8728,
-                "Delta_AF8": 0.4827,
-                "Theta_AF8": 0.4573,
-                "Alpha_AF8": 1.1671,
-                "Beta_AF8": 0.9768,
-                "Gamma_AF8": 0.5445
-              }
-        },
+        "id": "similarity_don_best",
+        "label": "Strongest",
+        "user": "Don",
+        "vector": {
+            "Delta_TP9": 1.4707,
+            "Theta_TP9": 4.0284,
+            "Alpha_TP9": 10.7014,
+            "Beta_TP9": 4.9742,
+            "Gamma_TP9": 2.5407,
+            "Delta_TP10": 1.4286,
+            "Theta_TP10": 6.8658,
+            "Alpha_TP10": 18.2472,
+            "Beta_TP10": 3.0313,
+            "Gamma_TP10": 1.2753,
+            "Delta_AF7": 0.5468,
+            "Theta_AF7": 0.5507,
+            "Alpha_AF7": 1.5176,
+            "Beta_AF7": 1.0541,
+            "Gamma_AF7": 0.5478,
+            "Delta_AF8": 0.7604,
+            "Theta_AF8": 0.5714,
+            "Alpha_AF8": 1.0216,
+            "Beta_AF8": 0.9514,
+            "Gamma_AF8": 0.4379
+        }
+    },
+    {
+        "id": "similarity_don_lfm",
+        "label": "Long-Form",
+        "color": "orange",
+        "user": "Don",
+        "vector": {
+            "Delta_TP9": 1.3878,
+            "Theta_TP9": 4.1017,
+            "Alpha_TP9": 11.7277,
+            "Beta_TP9": 2.4031,
+            "Gamma_TP9": 0.6464,
+            "Delta_TP10": 1.5538,
+            "Theta_TP10": 8.8229,
+            "Alpha_TP10": 23.545,
+            "Beta_TP10": 3.2146,
+            "Gamma_TP10": 0.8345,
+            "Delta_AF7": 0.4875,
+            "Theta_AF7": 0.5954,
+            "Alpha_AF7": 1.3402,
+            "Beta_AF7": 0.8758,
+            "Gamma_AF7": 0.3521,
+            "Delta_AF8": 0.5522,
+            "Theta_AF8": 0.5484,
+            "Alpha_AF8": 1.3396,
+            "Beta_AF8": 0.8513,
+            "Gamma_AF8": 0.3215
+        }
+    },
+    {
+        "id":"similarity_stephen",
+        "label": "Mantra",
+        "user": "Stephen",
+        "vector": {
+            "Delta_TP9": 0.7285,
+            "Theta_TP9": 0.9326,
+            "Alpha_TP9": 5.1735,
+            "Beta_TP9": 1.4373,
+            "Gamma_TP9": 0.5841,
+            "Delta_TP10": 0.7587,
+            "Theta_TP10": 0.8373,
+            "Alpha_TP10": 4.6493,
+            "Beta_TP10": 1.6444,
+            "Gamma_TP10": 0.5726,
+            "Delta_AF7": 0.6379,
+            "Theta_AF7": 0.4022,
+            "Alpha_AF7": 1.0903,
+            "Beta_AF7": 0.9648,
+            "Gamma_AF7": 0.8728,
+            "Delta_AF8": 0.4827,
+            "Theta_AF8": 0.4573,
+            "Alpha_AF8": 1.1671,
+            "Beta_AF8": 0.9768,
+            "Gamma_AF8": 0.5445
+        }
+    },
+    {
+        "id": "similarity_kaio_insight",
+        "label": "Insight",
+        "color": "orange",
+        "user": "Kaio",
+        "vector": {
+            "Delta_TP9": 0.9785,
+            "Theta_TP9": 1.2636,
+            "Alpha_TP9": 4.3148,
+            "Beta_TP9": 1.3281,
+            "Gamma_TP9": 0.8088,
+            "Delta_TP10": 0.5823,
+            "Theta_TP10": 1.1362,
+            "Alpha_TP10": 3.4534,
+            "Beta_TP10": 1.2284,
+            "Gamma_TP10": 0.7105,
+            "Delta_AF7": 1.1717,
+            "Theta_AF7": 0.5416,
+            "Alpha_AF7": 0.6118,
+            "Beta_AF7": 0.7704,
+            "Gamma_AF7": 0.4316,
+            "Delta_AF8": 0.4204,
+            "Theta_AF8": 0.3207,
+            "Alpha_AF8": 0.5196,
+            "Beta_AF8": 0.701,
+            "Gamma_AF8": 0.5069
+        }
 
 
-        "similarity_kaio_insight":
-        {
-            "label": "Insight",
-            "color": "orange",
-            "user": "Kaio",
-            "vector": {
-                "Delta_TP9": 0.9785,
-                "Theta_TP9": 1.2636,
-                "Alpha_TP9": 4.3148,
-                "Beta_TP9": 1.3281,
-                "Gamma_TP9": 0.8088,
-                "Delta_TP10": 0.5823,
-                "Theta_TP10": 1.1362,
-                "Alpha_TP10": 3.4534,
-                "Beta_TP10": 1.2284,
-                "Gamma_TP10": 0.7105,
-                "Delta_AF7": 1.1717,
-                "Theta_AF7": 0.5416,
-                "Alpha_AF7": 0.6118,
-                "Beta_AF7": 0.7704,
-                "Gamma_AF7": 0.4316,
-                "Delta_AF8": 0.4204,
-                "Theta_AF8": 0.3207,
-                "Alpha_AF8": 0.5196,
-                "Beta_AF8": 0.701,
-                "Gamma_AF8": 0.5069
-              }
-            
-    
-        },
-        "similarity_kaio_fruition":
-        {
-            "label": "Fruition",
-            "color": "orange",
-            "user": "Kaio",
-            "vector":         {
-                "Delta_TP9": 0.8983,
-                "Theta_TP9": 2.1087,
-                "Alpha_TP9": 7.1339,
-                "Beta_TP9": 2.248,
-                "Gamma_TP9": 2.0346,
-                "Delta_TP10": 0.7555,
-                "Theta_TP10": 1.9615,
-                "Alpha_TP10": 6.8535,
-                "Beta_TP10": 2.4345,
-                "Gamma_TP10": 2.0109,
-                "Delta_AF7": 6.523,
-                "Theta_AF7": 6.1074,
-                "Alpha_AF7": 6.936,
-                "Beta_AF7": 5.0924,
-                "Gamma_AF7": 2.6578,
-                "Delta_AF8": 1.1437,
-                "Theta_AF8": 0.8041,
-                "Alpha_AF8": 0.6695,
-                "Beta_AF8": 1.9594,
-                "Gamma_AF8": 1.3774
-              }
-    
-            
-    
-        },
+    },
+    {
+        "id": "similarity_kaio_fruition",
+        "label": "Fruition",
+        "color": "orange",
+        "user": "Kaio",
+        "vector": {
+            "Delta_TP9": 1.4477,
+            "Theta_TP9": 2.3049,
+            "Alpha_TP9": 6.2219,
+            "Beta_TP9": 2.533,
+            "Gamma_TP9": 5.2622,
+            "Delta_TP10": 0.9544,
+            "Theta_TP10": 2.1601,
+            "Alpha_TP10": 2.404,
+            "Beta_TP10": 1.913,
+            "Gamma_TP10": 5.4469,
+            "Delta_AF7": 4.9145,
+            "Theta_AF7": 4.8093,
+            "Alpha_AF7": 2.3794,
+            "Beta_AF7": 1.5913,
+            "Gamma_AF7": 2.248,
+            "Delta_AF8": 13.4071,
+            "Theta_AF8": 3.4181,
+            "Alpha_AF8": 4.6864,
+            "Beta_AF8": 4.9052,
+            "Gamma_AF8": 7.1536
+          }
 
+    },
+    {
+        "id": "similarity_nii_biaural",
+        "user": "Nii",
+        "label": "Binaural Beats",
+        "vector": {
+            "Delta_TP9": 1.8505,
+            "Theta_TP9": 4.2806,
+            "Alpha_TP9": 12.6758,
+            "Beta_TP9": 2.481,
+            "Gamma_TP9": 0.552,
+            "Delta_TP10": 1.5638,
+            "Theta_TP10": 3.8686,
+            "Alpha_TP10": 9.4056,
+            "Beta_TP10": 2.3955,
+            "Gamma_TP10": 0.8443,
+            "Delta_AF7": 0.5984,
+            "Theta_AF7": 0.8554,
+            "Alpha_AF7": 1.3902,
+            "Beta_AF7": 0.8076,
+            "Gamma_AF7": 0.4655,
+            "Delta_AF8": 0.4683,
+            "Theta_AF8": 0.6215,
+            "Alpha_AF8": 1.2577,
+            "Beta_AF8": 0.7196,
+            "Gamma_AF8": 0.354
+        }
+    },
+    {
+        "id": "similarity_nii_selfinquiry",
+        "label": "Self-Inquiry",
+        "user": "Nii",
+        "vector": {
+            "Delta_TP9": 1.6646,
+            "Theta_TP9": 3.0294,
+            "Alpha_TP9": 7.4222,
+            "Beta_TP9": 3.6368,
+            "Gamma_TP9": 1.573,
+            "Delta_TP10": 1.8012,
+            "Theta_TP10": 2.4682,
+            "Alpha_TP10": 7.1187,
+            "Beta_TP10": 3.1906,
+            "Gamma_TP10": 1.6102,
+            "Delta_AF7": 1.1031,
+            "Theta_AF7": 0.9245,
+            "Alpha_AF7": 1.6865,
+            "Beta_AF7": 1.1818,
+            "Gamma_AF7": 0.6617,
+            "Delta_AF8": 0.9774,
+            "Theta_AF8": 0.8669,
+            "Alpha_AF8": 1.6642,
+            "Beta_AF8": 1.0951,
+            "Gamma_AF8": 0.5504
+        }
+    },
+    {
+        "id":"similarity_nii_mantra",
+        "label": "Mantra",
+        "user": "Nii",
+        "vector": {
+            "Delta_TP9": 1.3258,
+            "Theta_TP9": 2.265,
+            "Alpha_TP9": 4.3775,
+            "Beta_TP9": 2.4664,
+            "Gamma_TP9": 1.0497,
+            "Delta_TP10": 1.2721,
+            "Theta_TP10": 2.4712,
+            "Alpha_TP10": 4.2347,
+            "Beta_TP10": 2.3411,
+            "Gamma_TP10": 1.2725,
+            "Delta_AF7": 1.328,
+            "Theta_AF7": 0.9616,
+            "Alpha_AF7": 1.7294,
+            "Beta_AF7": 1.516,
+            "Gamma_AF7": 0.8399,
+            "Delta_AF8": 1.016,
+            "Theta_AF8": 0.8255,
+            "Alpha_AF8": 1.3398,
+            "Beta_AF8": 1.3906,
+            "Gamma_AF8": 0.8066
+        }
+    },
+    {
+        "id": "similarity_steffan_insight",
+        "label": "Insight",
+        "user": "Steffan",
+        "vector": {
+            "Delta_TP9": 4.7075,
+            "Theta_TP9": 3.3454,
+            "Alpha_TP9": 3.206,
+            "Beta_TP9": 1.7309,
+            "Gamma_TP9": 0.465,
+            "Delta_TP10": 4.611,
+            "Theta_TP10": 2.3351,
+            "Alpha_TP10": 2.6468,
+            "Beta_TP10": 1.9015,
+            "Gamma_TP10": 1.2289,
+            "Delta_AF7": 0.4492,
+            "Theta_AF7": 0.6118,
+            "Alpha_AF7": 0.75,
+            "Beta_AF7": 0.5773,
+            "Gamma_AF7": 0.4057,
+            "Delta_AF8": 0.5768,
+            "Theta_AF8": 0.5272,
+            "Alpha_AF8": 1.1107,
+            "Beta_AF8": 0.6601,
+            "Gamma_AF8": 0.3638
+          }
+    },
+    {
+        "id":     "similarity_steffan_mindfulness",
+        "label": "Mindfulness",
+        "user": "Steffan",
+        "vector": {
+            "Delta_TP9": 2.2266,
+            "Theta_TP9": 1.9115,
+            "Alpha_TP9": 3.5061,
+            "Beta_TP9": 2.0029,
+            "Gamma_TP9": 0.5014,
+            "Delta_TP10": 2.1239,
+            "Theta_TP10": 1.7403,
+            "Alpha_TP10": 3.2478,
+            "Beta_TP10": 1.6695,
+            "Gamma_TP10": 0.5763,
+            "Delta_AF7": 0.9139,
+            "Theta_AF7": 0.653,
+            "Alpha_AF7": 1.1158,
+            "Beta_AF7": 0.7262,
+            "Gamma_AF7": 0.3485,
+            "Delta_AF8": 0.8078,
+            "Theta_AF8": 0.586,
+            "Alpha_AF8": 1.0642,
+            "Beta_AF8": 0.6872,
+            "Gamma_AF8": 0.2943
+        }
+    },
 
-        "similarity_nii_selfinquiry":
-        {
-            "label": "Self-Inquiry",
-            "user": "Nii",
-            "vector": {
-                "Delta_TP9": 1.6646,
-                "Theta_TP9": 3.0294,
-                "Alpha_TP9": 7.4222,
-                "Beta_TP9": 3.6368,
-                "Gamma_TP9": 1.573,
-                "Delta_TP10": 1.8012,
-                "Theta_TP10": 2.4682,
-                "Alpha_TP10": 7.1187,
-                "Beta_TP10": 3.1906,
-                "Gamma_TP10": 1.6102,
-                "Delta_AF7": 1.1031,
-                "Theta_AF7": 0.9245,
-                "Alpha_AF7": 1.6865,
-                "Beta_AF7": 1.1818,
-                "Gamma_AF7": 0.6617,
-                "Delta_AF8": 0.9774,
-                "Theta_AF8": 0.8669,
-                "Alpha_AF8": 1.6642,
-                "Beta_AF8": 1.0951,
-                "Gamma_AF8": 0.5504
-              }
-        },
-        "similarity_nii_mantra":
-        {
-            "label": "Mantra",
-            "user": "Nii",
-            "vector": {
-                "Delta_TP9": 1.3258,
-                "Theta_TP9": 2.265,
-                "Alpha_TP9": 4.3775,
-                "Beta_TP9": 2.4664,
-                "Gamma_TP9": 1.0497,
-                "Delta_TP10": 1.2721,
-                "Theta_TP10": 2.4712,
-                "Alpha_TP10": 4.2347,
-                "Beta_TP10": 2.3411,
-                "Gamma_TP10": 1.2725,
-                "Delta_AF7": 1.328,
-                "Theta_AF7": 0.9616,
-                "Alpha_AF7": 1.7294,
-                "Beta_AF7": 1.516,
-                "Gamma_AF7": 0.8399,
-                "Delta_AF8": 1.016,
-                "Theta_AF8": 0.8255,
-                "Alpha_AF8": 1.3398,
-                "Beta_AF8": 1.3906,
-                "Gamma_AF8": 0.8066
-              }
-        },
-   
-        "similarity_steffan_insight":
-        {
-            "label": "Insight",
-            "user": "Steffan",
-            "vector": {
-                "Delta_TP9": 4.2037,
-                "Theta_TP9": 2.6036,
-                "Alpha_TP9": 3.8625,
-                "Beta_TP9": 1.8935,
-                "Gamma_TP9": 0.464,
-                "Delta_TP10": 4.0064,
-                "Theta_TP10": 2.5881,
-                "Alpha_TP10": 3.3845,
-                "Beta_TP10": 2.2958,
-                "Gamma_TP10": 1.0896,
-                "Delta_AF7": 0.5174,
-                "Theta_AF7": 0.492,
-                "Alpha_AF7": 0.8977,
-                "Beta_AF7": 0.6665,
-                "Gamma_AF7": 0.3695,
-                "Delta_AF8": 0.6783,
-                "Theta_AF8": 0.5458,
-                "Alpha_AF8": 1.0276,
-                "Beta_AF8": 0.7519,
-                "Gamma_AF8": 0.3325
-              }
-        },
-        "similarity_steffan_mindfulness":
-        {
-            "label": "Mindfulness",
-            "user": "Steffan",
-            "vector": {
-                "Delta_TP9": 2.2266,
-                "Theta_TP9": 1.9115,
-                "Alpha_TP9": 3.5061,
-                "Beta_TP9": 2.0029,
-                "Gamma_TP9": 0.5014,
-                "Delta_TP10": 2.1239,
-                "Theta_TP10": 1.7403,
-                "Alpha_TP10": 3.2478,
-                "Beta_TP10": 1.6695,
-                "Gamma_TP10": 0.5763,
-                "Delta_AF7": 0.9139,
-                "Theta_AF7": 0.653,
-                "Alpha_AF7": 1.1158,
-                "Beta_AF7": 0.7262,
-                "Gamma_AF7": 0.3485,
-                "Delta_AF8": 0.8078,
-                "Theta_AF8": 0.586,
-                "Alpha_AF8": 1.0642,
-                "Beta_AF8": 0.6872,
-                "Gamma_AF8": 0.2943
-              }
-        },
-
-
-        
+    {
+        "id":     "similarity_steffan_jhana1",
+        "label": "1st Jhana",
+        "user": "Steffan",
+        "vector": {
+            "Delta_TP9": 1.8015,
+            "Theta_TP9": 1.7209,
+            "Alpha_TP9": 3.2084,
+            "Beta_TP9": 1.524,
+            "Gamma_TP9": 0.7385,
+            "Delta_TP10": 2.0407,
+            "Theta_TP10": 1.915,
+            "Alpha_TP10": 2.8583,
+            "Beta_TP10": 2.1874,
+            "Gamma_TP10": 1.4816,
+            "Delta_AF7": 0.5964,
+            "Theta_AF7": 0.4348,
+            "Alpha_AF7": 0.8232,
+            "Beta_AF7": 0.8205,
+            "Gamma_AF7": 0.4163,
+            "Delta_AF8": 0.9866,
+            "Theta_AF8": 0.4659,
+            "Alpha_AF8": 0.9568,
+            "Beta_AF8": 0.7963,
+            "Gamma_AF8": 0.3401
+          }
     }
+
+
+
+]
+

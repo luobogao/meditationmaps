@@ -16,7 +16,7 @@ function cosineSimilarity(a, b)
 // I propose that this measurement is best for measuring the "style" of a meditation vs the strength
 {
     var similarity = dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
-    if (similarity < 0) similarity = 0
+    //if (similarity < 0) similarity = 0
     return similarity
 }
 

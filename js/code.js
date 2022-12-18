@@ -34,7 +34,8 @@ var state =
 }
 
 function receivedFile() {
-
+    // Callback from the "browse" button
+    // fr.result contains the string of the file that was uploading
 
     let string = fr.result
     let data = d3.csvParse(string)
@@ -45,7 +46,70 @@ function receivedFile() {
 
 
 }
+
+
+
+function averageRows(rows, roundN) {
+
+    const channels = ["TP9", "TP10", "AF7", "AF8"]
+    const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+
+
+    roundN = Math.round(roundN)
+    const roundN_half = Math.round(roundN / 2)
+    let newRows = []
+    for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN_half) {
+        if (i < rows.length) {
+            let row = rows[i]
+            let newRow = {}
+            newRow.seconds = row.seconds
+            newRow.minutes = row.minutes
+
+            // Average each band + channel
+            bands.forEach(band => {
+                channels.forEach(channel => {
+                    let avgArray = []
+                    const key = band + "_" + channel // "Gamma_TP10"
+
+                    for (let a = i - roundN_half; a < i + roundN_half; a++) {
+                        var row = rows[a]
+
+                        let val = row[key]
+                        if (!isNaN(val)) {
+                            avgArray.push(val)
+                        }
+
+                    }
+                    // If there are not enough valid values for an average, return NaN
+                    if (avgArray.length > roundN_half) {
+                        let avg = round(d3.quantile(avgArray, 0.5))
+                        let max = round(d3.quantile(avgArray, 0.95))
+                        let min = round(d3.quantile(avgArray, 0.05))
+                        newRow[key] = avg
+                        newRow[key + "_min"] = min
+                        newRow[key + "_max"] = max
+
+                    }
+                    else {
+
+                        newRow[key] = NaN
+                    }
+
+                })
+            })
+            newRow.vector = getRootVector(newRow) // Compute the averaged vector
+
+            newRows.push(newRow)
+
+        }
+    }
+    return newRows
+}
+
 function processMuseData(rows) {
+    // Cleans up and pre-processes the data from a Muse CSV
+    // Removes blank rows, adds timestamps, removes rows where user is moving too much, then averages this data
+
     // Remove rows with blank data
     rows = rows.filter(row => row.Delta_TP9 || row.Theta_AF8 || row.Beta_AF7 || row.Gamma_TP10) // remove blank rows
 
@@ -158,6 +222,7 @@ function processMuseData(rows) {
     let averageHighRes = averageRows(clone(standardRows), highResolution)
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
     let average10 = averageRows(clone(standardRows), standardRows.length / 10)
+    let average3 = averageRows(clone(standardRows), standardRows.length / 3) // only used to compute some Waypoints for this user
 
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
@@ -165,6 +230,7 @@ function processMuseData(rows) {
     state.lowRes = averageLowRes
     state.highRes = averageHighRes
     state.avg10 = average10
+    state.avg3 = average3
 
     // Find the first and last timestamp for timeseries chart x-axis
     const first_seconds = standardRows[0].seconds
@@ -176,6 +242,48 @@ function processMuseData(rows) {
     averageLowRes.forEach(entry => {
         //console.log(getRootVector(entry)) show all vectors
     })
+
+    // re-build the Model using a few points from the user's data
+    // Including user data like this helps to orient the chart 
+    var userVectors = average3.map(e => getRelativeVector(e.vector))
+
+    
+    // Filter the waypoints by minimum distance from any of these test user vectors
+    var distanceIds = {}
+    userVectors.forEach(uservector => {
+
+        waypoints.forEach(waypoint => {
+            var waypoint_vector = getRelativeVector(waypoint.vector)
+            var id = waypoint.id
+            var distance = cosineSimilarity(uservector, waypoint_vector)
+            if (id in distanceIds)
+            {
+                if (distanceIds[id] < distance)
+                {
+                    distanceIds[id] = distance
+                }
+                
+            }
+            else
+                {
+                    distanceIds[id] = distance
+                }
+            
+        })
+    })
+    var maxd = Object.entries(distanceIds)
+    maxd.sort(function (a, b) {
+        return a[1] - b[1]
+    })
+    var filtered_waypoint_ids = maxd.slice(2).map(e => e[0])
+    var filtered_waypoints = waypoints.filter(e => filtered_waypoint_ids.includes(e.id)).map(e => getRelativeVector(e.vector))
+    console.log("Using " + filtered_waypoints.length + " waypoints")
+
+    // Combine the waypoints with the three user points
+    var allwaypoints = filtered_waypoints //.concat(userVectors)
+        
+    buildModel(allwaypoints)
+    updateChartWaypoints()
     updateChartUser(state.highRes, "small")
     updateChartUser(state.avg10, "large")
 
@@ -184,324 +292,43 @@ function processMuseData(rows) {
 
 
 
-function averageRows(rows, roundN) {
-
-    const channels = ["TP9", "TP10", "AF7", "AF8"]
-    const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-
-
-    roundN = Math.round(roundN)
-    const roundN_half = Math.round(roundN / 2)
-    let newRows = []
-    for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN_half) {
-        if (i < rows.length) {
-            let row = rows[i]
-            let newRow = {}
-            newRow.seconds = row.seconds
-            newRow.minutes = row.minutes
-            newRow.vector_raw = getRelativeVector(row)
-
-            // Average each band + channel
-            bands.forEach(band => {
-                channels.forEach(channel => {
-                    let avgArray = []
-                    const key = band + "_" + channel // "Gamma_TP10"
-
-                    for (let a = i - roundN_half; a < i + roundN_half; a++) {
-                        var row = rows[a]
-
-                        let val = row[key]
-                        if (!isNaN(val)) {
-                            avgArray.push(val)
-                        }
-
-                    }
-                    // If there are not enough valid values for an average, return NaN
-                    if (avgArray.length > roundN_half) {
-                        let avg = round(d3.quantile(avgArray, 0.5))
-                        let max = round(d3.quantile(avgArray, 0.95))
-                        let min = round(d3.quantile(avgArray, 0.05))
-                        newRow[key] = avg
-                        newRow[key + "_min"] = min
-                        newRow[key + "_max"] = max
-
-                    }
-                    else {
-
-                        newRow[key] = NaN
-                    }
-
-                })
-            })
-            newRow.vector = getRootVector(newRow) // Compute the averaged vector
-
-            newRows.push(newRow)
-
-        }
-    }
-    return newRows
-}
-
-function updateChart() {
-    var linkSize = 1
-    var labelSize = "14px"
-    var stateSize = 10
-    d3.select("#chart").selectAll("*").remove() // Clear everything
-
-
-    let zoom = d3.zoom()
-        .on('zoom', handleZoom);
-
-    function handleZoom(e) {
-        // When user zooms, all chart "g" elements are changed accordingly
-        d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
-
-
-    }
-
-
-    // Add a series of "g" containers to the SVG in order of "elevation"
-    // This allows for future chart updates to act on shapes below these shapes
-    var svg_user = d3.select("#chart").append("g").attr("id", "chart_user")
-    var svg = d3.select("#chart").append("g").attr("id", "chart_labels")
-    var svg2 = d3.select("#chart").append("g").attr("id", "chart_standards")
-
-    d3.select("#chartsvg").call(zoom)
-
-
-
-    var standards = Object.entries(standard_vectors).map(entry => entry[1])
-
-    var standardCoordinates = standards.map(e => e.coordinates)
-
-
-    // Find the minimum and maxiumum range of the model, set the chart size a bit larger than those bounds
-    var minx = d3.min(standardCoordinates.map(e => e[0]))
-    var miny = d3.min(standardCoordinates.map(e => e[1]))
-    var maxx = d3.max(standardCoordinates.map(e => e[0]))
-    var maxy = d3.max(standardCoordinates.map(e => e[1]))
-
-    minx = minx * 2
-    maxx = maxx * 2
-    miny = miny * 2
-    maxy = maxy * 2
-
-    // These D3 functions return the properly scaled x and y coordinates
-    x = d3.scalePow()
-        .exponent(0.7)
-        .domain([minx, maxx]) // input
-        //.domain ([-500, 1000])
-        .range([0, chartWidth]); // output
-
-    y = d3.scalePow()
-        .exponent(0.7)
-        .domain([miny, maxy])
-        //.domain ([-500, 500])
-        .range([chartHeight, 0])
-
-
-    function add(xi, yi, size, color, opacity) {
-        svg2.append("circle")
-            .attr("cx", x(xi))
-            .attr("cy", y(yi))
-            .attr("r", size)
-            .attr("opacity", opacity)
-            .attr("fill", color)
-
-    }
-
-    standards.forEach(entry => {
-        var xi = entry.coordinates[0]
-        var yi = entry.coordinates[1]
-        add(xi, yi, stateSize, "blue", 1)
-
-    })
-
-
-
-    // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
-
-    var label_array = []
-    var anchor_array = []
-    standards.forEach(entry => {
-        var xi = entry.coordinates[0]
-        var yi = entry.coordinates[1]
-        label_array.push({ x: x(xi), y: y(yi), width: 10, height: 4, name: entry.user + " " + entry.label })
-        anchor_array.push({ x: x(xi), y: y(yi), r: stateSize * 2 })
-    })
-    var labels = svg.selectAll(".label")
-        .data(label_array)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .style("font-size", labelSize)
-        .attr("x", function (d) { return d.x })
-        .attr("y", function (d) { return d.y })
-        .text(function (d) { return d.name })
-
-    var links = svg.selectAll(".link")
-        .data(label_array)
-        .enter()
-        .append("line")
-        .attr("class", "link")
-        .attr("opacity", 0.2)
-        .attr("x1", function (d) { return (d.x); })
-        .attr("y1", function (d) { return (d.y); })
-        .attr("x2", function (d) { return (d.x); })
-        .attr("y2", function (d) { return (d.y); })
-        .attr("stroke-width", linkSize)
-        .attr("stroke", "black");
-
-    var index = 0
-    labels.each(function () {
-        label_array[index].width = this.getBBox().width;
-        label_array[index].height = this.getBBox().height;
-        index++
-
-    })
-
-    // Use d3-labeler library to move each label so that it doesn't overlap
-    d3.labeler()
-        .label(label_array)
-        .anchor(anchor_array)
-        .width(chartWidth)
-        .height(chartHeight)
-        .start(1000)
-
-
-    labels
-        .transition()
-        .duration(1000)
-        .attr("x", function (d) { return d.x })
-        .attr("y", function (d) { return d.y })
-
-    links
-        .transition()
-        .duration(800)
-        .attr("x2", function (d) { return d.x; })
-        .attr("y2", function (d) { return d.y - 2; });
-
-
-
-
-
-
-
-}
-
-
-function updateChartUser(data, type) {
-
-    var userSize = 25
-    var userOpacity = 0.02
-    if (type == "large")
-    {
-        userSize = 5
-        userOpacity = 0.9
-    } 
-
-
-    var svg = d3.select("#chart_user")
-    svg.selectAll("*").remove() // Clear last chart, if any
-
-    var vectors = data.map(e => getRelativeVector(e.vector))
-
-    var mapped = runModel(vectors, state.model.principals, state.model.means)
-
-    var index = 0
-
-    var lineData = []
-
-
-
-    mapped.forEach(entry => {
-
-
-        var moment = data[index]
-        var xi = x(entry[0])
-        var yi = y(entry[1])
-
-        lineData.push([xi, yi])
-
-        setTimeout(function () {
-            svg.append("circle")
-                .attr("cx", xi)
-                .attr("cy", yi)
-                .attr("r", userSize)
-                .attr("opacity", userOpacity)
-                .attr("fill", "black")
-                .on("mouseover", function (d) {
-                    d3.select(this).style("opacity", 0.9)
-                    //console.log(moment.vector)
-                    console.log(moment.Gamma_AF7)
-
-                })
-                .on("click", function (d) {
-                    console.log(moment.vector)
-                })
-                .on("mouseout", function (d) {
-                    d3.select(this).style("opacity", userOpacity)
-                })
-
-
-
-        }, index * (1000 / mapped.length))
-
-        index++
-
-    })
-
-    if (type == "large") {
-        setTimeout(function()
-        {
-            svg.append("path")
-            .attr("fill", "none")
-            .attr("stroke", "black")
-            .attr("d", function () { return line(lineData) })
-        }, 1000)
-        
-    }
-
-
-
-
-}
-var line = d3.line()
-    .x(function (d, i) { return d[0]; })
-    .y(function (d, i) {
-        return d[1]
-
-    })
-    .curve(d3.curveMonotoneX) // apply smoothing to the line
-
-
-function buildModel() {
-    var data = Object.entries(standard_vectors).map(e => getRelativeVector(e[1].vector))
-    var pca_data = pca(data)
+function buildModel(vectors) {
+    // Builds the AI model using a collection of input vectors
+    // These vectors are the raw (but averaged) values for each band/channel
+    // Okay to use a mix of the "standard" vectors plus a few user vectors
+    // Does not return x-y points - for that, need to call "run model" using the parameters set by this function
+
+    var pca_data = pca(vectors)
     var principals = pca_data[0]
     var means = pca_data[1]
     state.model.principals = principals
     state.model.means = means
-    var model = runModel(data, principals, means)
 
-    // Store these mapped coorindate in each standard's entry 
-    var keys = Object.keys(standard_vectors)
-    for (var c = 0; c < keys.length; c++) {
-        var coord = model[c]
-        var key = keys[c]
-        standard_vectors[key].coordinates = coord
+    // Build x-y points for each waypoint and store them
+    let points = runModel(waypoints.map(e => getRelativeVector(e.vector)))
+    var i = 0
+    waypoints.map(waypoint => 
+        {
+            waypoint.coordinates = points[i]
+            i ++
+        })
 
-    }
+    
+}
+function runModel(rows)
+// Takes rows of vectors calculated from the Muse data, and the principals (output from PCA function)
+// Returns a list of x-y points, the location on 2-d space for each of those vectors
 
+{
+    var d = math.transpose(subtract_means(rows, state.model.means))
+    var mappedCoordinates = math.transpose(math.multiply(state.model.principals, d))
+    return mappedCoordinates
 }
 
-// Add the "browse" button
-buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")
 
-// Build model of meditation states using the "vectors.js" file
-buildModel()
-buildChart()
-function buildChart() {
+
+function setup() {
+    // First-time setup of all the GUI sizes etc
 
     // Set full screen
     chartWidth = window.innerWidth - sidebarWidth
@@ -518,16 +345,30 @@ function buildChart() {
     var svg = d3.select("#chartsvg")
         .attr("width", chartWidth + (2 * chartMargin))
         .attr("height", chartHeight + (2 * chartMargin))
-        .style("background-color", "grey")
+        .style("background-color", "lightgrey")
         .append("g")
         .attr("id", "chart")
         .attr("width", chartWidth)
         .attr("height", chartHeight)
         .attr("transform", "translate(" + chartMargin + "," + chartMargin + ")")
 
+    // Add the "browse" button
+    buildBrowseFile(d3.select("#browse-div"), "UPLOAD", "t1")
+
+    // Build model of meditation states using the "vectors.js" file
+    // This first time, include ALL the waypoints
+    let vectors = waypoints.map(e => getRelativeVector(e.vector))
+    buildModel(vectors)
+
+
+    // Immediately display a map of the waypoints when user loads page
+    updateChartWaypoints()
 
 }
-updateChart()
+
+setup()
+
+
 
 
 
