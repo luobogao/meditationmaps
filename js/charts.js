@@ -12,11 +12,14 @@ var svg;
 var label_array = []
 var anchor_array = []
 var linkSize = 1
-var labelSize = "14px"
+var labelSize = "10px"
 var waypointR = 10      // Size of waypoint circles
 var x;
 var y;
 var z;
+var opacity;
+var minx, maxx, miny, maxy, minz, maxz
+    
 
 
 function updateChartWaypoints() {
@@ -34,14 +37,35 @@ function updateChartWaypoints() {
         // When user zooms, all chart "g" elements are changed accordingly
 
         const zoom_type = e.sourceEvent.type
-        console.log("x: " + x(0))
+
+        
+        x = d3.scaleLinear()
+            .domain([minx, maxx]) // input
+            //.domain ([-500, 1000])
+            .range([0, chartWidth]); // output
+
+        y = d3.scaleLinear()
+            .domain([miny, maxy])
+            //.domain ([-500, 500])
+            .range([chartHeight, 0])
+
+        z = d3.scalePow()
+            .exponent(1)
+            .domain([minz, maxz])
+            .range([5, 10])
+
+
 
         if (zoom_type == "wheel") {
             // both 2d and 3d modes uses scroll wheel for zooming
-            e.transform.x = x(0)
-            e.transform.y = y(0)
+
+            var widthD = (chartWidth * e.transform.k) - chartWidth
+            var heightD = (chartHeight * e.transform.k) - chartHeight
+            e.transform.x = -1 * (widthD / 2)
+            e.transform.y = -1 * (heightD / 2)
+            console.log(e.transform)
             d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
-            
+
         }
         else {
 
@@ -63,9 +87,8 @@ function updateChartWaypoints() {
                 // 2d mode allows for panning
                 d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
             }
-
-
         }
+
 
 
 
@@ -91,17 +114,24 @@ function updateChartWaypoints() {
 
 
     // Find the minimum and maxiumum range of the model, set the chart size a bit larger than those bounds
-    var minx = d3.min(standardCoordinates.map(e => e[0]))
-    var miny = d3.min(standardCoordinates.map(e => e[1]))
-    var maxx = d3.max(standardCoordinates.map(e => e[0]))
-    var maxy = d3.max(standardCoordinates.map(e => e[1]))
-    var minz = d3.min(standardCoordinates.map(e => e[2]))
-    var maxz = d3.max(standardCoordinates.map(e => e[2]))
+    minx = d3.min(standardCoordinates.map(e => e[0]))
+    miny = d3.min(standardCoordinates.map(e => e[1]))
+    maxx = d3.max(standardCoordinates.map(e => e[0]))
+    maxy = d3.max(standardCoordinates.map(e => e[1]))
+    minz = d3.min(standardCoordinates.map(e => e[2]))
+    maxz = d3.max(standardCoordinates.map(e => e[2]))
 
     minx = minx * 2
     maxx = maxx * 2
     miny = miny * 2
     maxy = maxy * 2
+    
+
+    // Make the min/max square
+    if (Math.abs(minx) < maxx) minx = -1 * maxx
+    else maxx = -1 * minx
+    if (Math.abs(miny) < maxy) miny = -1 * maxy
+    else maxy = -1 * miny
 
     // These D3 functions return the properly scaled x and y coordinates
     x = d3.scaleLinear()
@@ -118,6 +148,10 @@ function updateChartWaypoints() {
         .exponent(1)
         .domain([minz, maxz])
         .range([5, 10])
+
+    opacity = d3.scaleLinear()
+        .domain([5, 10])
+        .range([0.2, 1])
 
     waypoints.forEach(entry => {
         var xi = entry.coordinates[0]
@@ -144,8 +178,15 @@ function updateChartWaypoints() {
         .attr("cy", function (d) {
             return y(d[1])
         })
-        .attr("r", waypointR)
+        
+        .attr("r", function (d) {
+            return z(d[2])
 
+        })
+        .style("opacity", function (d, i) {
+            if (i == 0) console.log(opacity(z(d[2])))
+            return opacity(z(d[2]))
+        })
         .attr("fill", "blue")
 
 
@@ -165,8 +206,12 @@ function updateChartWaypoints() {
 
         })
         .attr("x", function (d, i) {
-                         return d.x + waypointR
-             })
+            return d.x + waypointR
+        })
+        .style("font-size", function (d, i) {
+
+            return Math.floor(d.z) + "px"
+        })
         .attr("y", function (d) { return d.y - waypointR })
         .text(function (d) { return d.name })
 
@@ -306,7 +351,7 @@ function updateChartUser(data, type) {
 
 
 function rotate(pitch, yaw, roll, matrix, classname, type) {
-    
+
     var cosa = Math.cos(yaw);
     var sina = Math.sin(yaw);
 
@@ -351,9 +396,14 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
                     return y(d[1])
                 })
                 .attr("r", function (d) {
-                    //return z(d[2])
-                    return 10
+                    return z(d[2])
+
                 })
+                .style("opacity", function (d, i) {
+                    if (i == 0) console.log(opacity(z(d[2])))
+                    return opacity(z(d[2]))
+                })
+
                 .attr("z", function (d) { return z(d[2]) })
         }
         else {
@@ -367,12 +417,16 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
             matrix[i].z = z(Azx * px + Azy * py + Azz * pz);
 
 
-            var points = svg.selectAll("." + classname)
+            svg.selectAll("." + classname)
                 .attr("x", function (d) {
-                    return d.x + waypointR
+                    return d.x + d.z
                 })
                 .attr("y", function (d) {
-                    return d.y - waypointR
+                    return d.y - d.z
+                })
+                .style("font-size", function (d, i) {
+
+                    return Math.floor(d.z) + "px"
                 })
 
         }

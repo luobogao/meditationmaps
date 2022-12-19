@@ -1,12 +1,12 @@
 
 
 var sidebarWidth = 300
-var chartWidth = 800
-var chartHeight = 500
+
+var chartWidth = window.innerWidth - sidebarWidth - 250
+var chartHeight = window.innerHeight
+
 var chartMargin = 30
-var x;
-var y;
-var z;
+
 var mode3d = true // 3-d mode
 
 const minichartWidth = 200
@@ -372,9 +372,7 @@ function runModel(rows)
 function setup() {
     // First-time setup of all the GUI sizes etc
 
-    // Set full screen
-    chartWidth = window.innerWidth - sidebarWidth - 250
-    chartHeight = window.innerHeight
+
 
     // Check if user is on a phone
     if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i)) {
