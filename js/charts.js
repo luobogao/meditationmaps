@@ -8,6 +8,7 @@ var line = d3.line()
 //.curve(d3.curveMonotoneX) // apply smoothing to the line
 
 var waypointCircles = []
+var userCircles = []
 var svg;
 var label_array = []
 var anchor_array = []
@@ -63,7 +64,6 @@ function updateChartWaypoints() {
             var heightD = (chartHeight * e.transform.k) - chartHeight
             e.transform.x = -1 * (widthD / 2)
             e.transform.y = -1 * (heightD / 2)
-            console.log(e.transform)
             d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
 
         }
@@ -81,6 +81,7 @@ function updateChartWaypoints() {
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
                     rotate(xd / 100, 0, yd / 100, waypointCircles, "waypoints", "list")
                     rotate(xd / 100, 0, yd / 100, label_array, "label", "obj")
+                    rotate(xd / 100, 0, yd / 100, userCircles, "userpoints", "list")
                 }
             }
             else {
@@ -157,7 +158,7 @@ function updateChartWaypoints() {
         var xi = entry.coordinates[0]
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
-        waypointCircles.push([xi, yi, zi])
+        waypointCircles.push({ x: xi, y: yi, z: zi })
         if (entry.match == true) {
             label_array.push({ x: xi, y: yi, z: zi, width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
@@ -173,19 +174,19 @@ function updateChartWaypoints() {
         .attr("class", "waypoints")
         .attr("cx", function (d, i) {
             if (i == 0) console.log(x(d[0]))
-            return x(d[0])
+            return x(d.x)
         })
         .attr("cy", function (d) {
-            return y(d[1])
+            return y(d.y)
         })
 
         .attr("r", function (d) {
-            return z(d[2])
+            return z(d.z)
 
         })
         .style("opacity", function (d, i) {
-            if (i == 0) console.log(opacity(z(d[2])))
-            return opacity(z(d[2]))
+            if (i == 0) console.log(opacity(z(d.z)))
+            return opacity(z(d.z))
         })
         .attr("fill", "blue")
 
@@ -197,8 +198,8 @@ function updateChartWaypoints() {
         .enter()
         .append("text")
         .attr("class", "label")
-        .attr("x", function (d, i) {return x(d.x + waypointR)})
-        .attr("y", function (d) { return y(d.y - waypointR)})
+        .attr("x", function (d, i) { return x(d.x + waypointR) })
+        .attr("y", function (d) { return y(d.y - waypointR) })
         .style("font-size", function (d, i) {
 
             return Math.floor(z(d.z)) + "px"
@@ -261,7 +262,7 @@ function updateChartUser(data, type) {
         userSize = 5
         userOpacity = 0.9
     }
-
+    console.log("type: " + type)
 
     var svg = d3.select("#chart_user")
     svg.selectAll("*").remove() // Clear last chart, if any
@@ -274,9 +275,7 @@ function updateChartUser(data, type) {
 
     var lineData = []
 
-    var data = []
-
-
+    userCircles = []
     mapped.forEach(entry => {
 
 
@@ -284,32 +283,36 @@ function updateChartUser(data, type) {
         var xi = entry[0]
         var yi = entry[1]
         var zi = entry[2]
+        index ++
 
         lineData.push([xi, yi])
-        data.push({x: xi, y: yi, z: zi, moment: moment})
+        userCircles.push({ x: xi, y: yi, z: zi, moment: moment })
     })
 
+    
     if (type != "large") {
-
+        console.log(userCircles)
         svg
             .selectAll(".userpoints")
-            .data(data)
+            .data(userCircles)
             .enter()
             .append("circle")
-            .attr("cx", function (d) { return x(d.x) })
+            .attr("cx", function (d, i) { 
+                if (i == 0) console.log(x(d.x))
+                return x(d.x) })
             .attr("cy", function (d) { return y(d.y) })
-            .attr("r", function(d){return z(d.z)})
+            .attr("r", function (d) { return z(d.z) })
             .attr("seconds", function (d) {
                 return d.moment.seconds
             })
 
             .attr("class", "userpoints")
-            .attr("opacity", userOpacity)
-            .attr("fill", "grey")
+            .attr("opacity", 1)
+            .attr("fill", "black")
             .on("mouseover", function (d) {
                 d3.select(this).style("opacity", 0.9)
                 var marker = d3.select("#mini-marker")
-                
+
             })
             .on("click", function (d) {
                 console.log(moment.vector)
@@ -370,30 +373,33 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
         var px, py, pz
 
         if (type == "list") {
-            px = matrix[i][0];
-            py = matrix[i][1];
-            pz = matrix[i][2];
-            matrix[i][0] = Axx * px + Axy * py + Axz * pz;
-            matrix[i][1] = Ayx * px + Ayy * py + Ayz * pz;
-            matrix[i][2] = Azx * px + Azy * py + Azz * pz;
+
+            px = matrix[i].x
+            py = matrix[i].y
+            pz = matrix[i].z
+            matrix[i].x = Axx * px + Axy * py + Axz * pz
+            matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
+            matrix[i].z = Azx * px + Azy * py + Azz * pz
+
+
             var points = svg.selectAll("." + classname)
 
                 .attr("cx", function (d) {
-                    return x(d[0])
+                    return x(d.x)
                 })
                 .attr("cy", function (d) {
-                    return y(d[1])
+                    return y(d.y)
                 })
                 .attr("r", function (d) {
-                    return z(d[2])
+                    return z(d.z)
 
                 })
                 .style("opacity", function (d, i) {
-                    if (i == 0) console.log(opacity(z(d[2])))
+                    
                     return opacity(z(d[2]))
                 })
 
-                .attr("z", function (d) { return z(d[2]) })
+                .attr("z", function (d) { return z(d.z) })
         }
         else {
 
@@ -411,7 +417,7 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
                     return x(d.x) + z(d.z)
                 })
                 .attr("y", function (d) {
-                    return y(d.y) - z(d.z) 
+                    return y(d.y) - z(d.z)
                 })
                 .style("font-size", function (d, i) {
 
