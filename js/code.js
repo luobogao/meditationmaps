@@ -325,8 +325,7 @@ function rebuildChart() {
     else {
         buildModel(selected_waypoints)
         updateChartWaypoints()
-        updateChartUser(state.highRes, "small")
-        updateChartUser(state.avg10, "large")
+        updateChartUser(state.highRes)
         updateMiniChart(state.highRes)
     }
 

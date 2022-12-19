@@ -26,6 +26,7 @@ var minx, maxx, miny, maxy, minz, maxz
 function updateChartWaypoints() {
     label_array = []
     anchor_array = []
+    waypointCircles = []
     d3.select("#chart").selectAll("*").remove() // Clear everything
 
 
@@ -79,9 +80,9 @@ function updateChartWaypoints() {
                 lastx = x
                 lasty = y
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
-                    rotate(xd / 100, 0, yd / 100, waypointCircles, "waypoints", "list")
-                    rotate(xd / 100, 0, yd / 100, label_array, "label", "obj")
-                    rotate(xd / 100, 0, yd / 100, userCircles, "userpoints", "list")
+                    rotate(xd / 100, 0, yd / 100, waypointCircles, "waypoints", "list", "chart_labels")
+                    rotate(xd / 100, 0, yd / 100, label_array, "label", "obj", "chart_labels")
+                    rotate(xd / 100, 0, yd / 100, userCircles, "userpoints", "list", "chart_user")
                 }
             }
             else {
@@ -102,6 +103,8 @@ function updateChartWaypoints() {
     var svg_user = d3.select("#chart").append("g").attr("id", "chart_user")
     svg = d3.select("#chart").append("g").attr("id", "chart_labels")
     var svg2 = d3.select("#chart").append("g").attr("id", "chart_standards")
+
+    svg.selectAll("*").remove()
 
     d3.select("#chartsvg").call(zoom)
         .on("mousedown", function (d) {
@@ -158,14 +161,15 @@ function updateChartWaypoints() {
         var xi = entry.coordinates[0]
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
-        waypointCircles.push({ x: xi, y: yi, z: zi })
+        
         if (entry.match == true) {
+            waypointCircles.push({ x: xi, y: yi, z: zi})
             label_array.push({ x: xi, y: yi, z: zi, width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
 
     })
-
+    console.log("Adding waypoints: " + waypointCircles.length)
 
     svg.selectAll(".waypoints")
         .data(waypointCircles)
@@ -185,7 +189,7 @@ function updateChartWaypoints() {
 
         })
         .style("opacity", function (d, i) {
-            if (i == 0) console.log(opacity(z(d.z)))
+            
             return opacity(z(d.z))
         })
         .attr("fill", "blue")
@@ -283,66 +287,50 @@ function updateChartUser(data, type) {
         var xi = entry[0]
         var yi = entry[1]
         var zi = entry[2]
-        index ++
+        index++
 
         lineData.push([xi, yi])
         userCircles.push({ x: xi, y: yi, z: zi, moment: moment })
     })
 
-    
-    if (type != "large") {
-        console.log(userCircles)
-        svg
-            .selectAll(".userpoints")
-            .data(userCircles)
-            .enter()
-            .append("circle")
-            .attr("cx", function (d, i) { 
-                if (i == 0) console.log(x(d.x))
-                return x(d.x) })
-            .attr("cy", function (d) { return y(d.y) })
-            .attr("r", function (d) { return z(d.z) })
-            .attr("seconds", function (d) {
-                return d.moment.seconds
-            })
-
-            .attr("class", "userpoints")
-            .attr("opacity", 1)
-            .attr("fill", "black")
-            .on("mouseover", function (d) {
-                d3.select(this).style("opacity", 0.9)
-                var marker = d3.select("#mini-marker")
-
-            })
-            .on("click", function (d) {
-                console.log(moment.vector)
-            })
-            .on("mouseout", function (d) {
-                d3.select(this).style("opacity", userOpacity)
-            })
-    }
-
-    if (type == "large") {
-        setTimeout(function () {
-            svg.append("path")
-                .attr("fill", "none")
-                .attr("stroke", "black")
-            //.attr("d", function () { return line(lineData) })
-        }, 1000)
-
-    }
-    else {
-
-    }
 
 
+    svg
+        .selectAll(".userpoints")
+        .data(userCircles)
+        .enter()
+        .append("circle")
+        .attr("class", "userpoints")
+        .attr("cx", function (d, i) {
+            if (i == 0) console.log(x(d.x))
+            return x(d.x)
+        })
+        .attr("cy", function (d) { return y(d.y) })
+        .attr("r", function (d) { return z(d.z) })
+        .attr("seconds", function (d) {
+            return d.moment.seconds
+        })
 
+
+        .attr("opacity", userOpacity)
+        .attr("fill", "black")
+        .on("mouseover", function (d) {
+            d3.select(this).style("opacity", 0.9)
+            var marker = d3.select("#mini-marker")
+
+        })
+        .on("click", function (d) {
+            console.log(moment.vector)
+        })
+        .on("mouseout", function (d) {
+            d3.select(this).style("opacity", userOpacity)
+        })
 
 }
 
 
 
-function rotate(pitch, yaw, roll, matrix, classname, type) {
+function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
 
     var cosa = Math.cos(yaw);
     var sina = Math.sin(yaw);
@@ -368,7 +356,7 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
     // TODO: use matrix math library
     //var m = math.matrix([[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]])
 
-
+    var svg = d3.select("#" + svgid)
     for (var i = 0; i < matrix.length; i++) {
         var px, py, pz
 
@@ -381,25 +369,6 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
             matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
             matrix[i].z = Azx * px + Azy * py + Azz * pz
 
-
-            var points = svg.selectAll("." + classname)
-
-                .attr("cx", function (d) {
-                    return x(d.x)
-                })
-                .attr("cy", function (d) {
-                    return y(d.y)
-                })
-                .attr("r", function (d) {
-                    return z(d.z)
-
-                })
-                .style("opacity", function (d, i) {
-                    
-                    return opacity(z(d[2]))
-                })
-
-                .attr("z", function (d) { return z(d.z) })
         }
         else {
 
@@ -411,29 +380,46 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
             matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
             matrix[i].z = Azx * px + Azy * py + Azz * pz
 
-
-            svg.selectAll("." + classname)
-                .attr("x", function (d) {
-                    return x(d.x) + z(d.z)
-                })
-                .attr("y", function (d) {
-                    return y(d.y) - z(d.z)
-                })
-                .style("font-size", function (d, i) {
-
-                    return Math.floor(z(d.z)) + "px"
-                })
-
         }
-
-
-
     }
 
 
+    if (type == "list") {
+        
+        var points = svg.selectAll("." + classname)
+            .attr("cx", function (d) {
+                return x(d.x)
+            })
+            .attr("cy", function (d) {
+                return y(d.y)
+            })
+            .attr("r", function (d) {
+                return z(d.z)
+
+            })
+            .style("opacity", function (d, i) {
+
+                return opacity(z(d[2]))
+            })
+
+            .attr("z", function (d) { return z(d.z) })
+    }
+    else {
 
 
+        svg.selectAll("." + classname)
+            .attr("x", function (d) {
+                return x(d.x) + z(d.z)
+            })
+            .attr("y", function (d) {
+                return y(d.y) - z(d.z)
+            })
+            .style("font-size", function (d, i) {
 
+                return Math.floor(z(d.z)) + "px"
+            })
+
+    }
 }
 
 
