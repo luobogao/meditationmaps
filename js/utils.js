@@ -18,6 +18,7 @@ function ratio(x, y)
 }
 function getEveryNth(arr, nth) {
     const result = [];
+    nth = Math.floor(nth)
 
     for (let i = 0; i < arr.length; i += nth) {
         result.push(arr[i]);
