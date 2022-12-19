@@ -9,11 +9,16 @@ var line = d3.line()
 
 var waypointCircles = []
 var svg;
+var label_array = []
+var anchor_array = []
 
 function updateChartWaypoints() {
     var linkSize = 1
     var labelSize = "14px"
+    var waypointR = 10
     var stateSize = 10
+    label_array = []
+    anchor_array = []
     d3.select("#chart").selectAll("*").remove() // Clear everything
 
 
@@ -24,25 +29,37 @@ function updateChartWaypoints() {
     var lasty = 0
     function handleZoom(e) {
         // When user zooms, all chart "g" elements are changed accordingly
-        
+
         const zoom_type = e.sourceEvent.type
+
+        
         if (zoom_type == "wheel") {
+            // both 2d and 3d modes uses scroll wheel for zooming
+
             d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
         }
         else {
-            
-            var x = e.sourceEvent.clientX
-            var y = e.sourceEvent.clientY
 
-            var xd = lastx - x
-            var yd = y - lasty
-            lastx = x
-            lasty = y
-            if (Math.abs(xd) < 20 && Math.abs(yd)< 20)
-            {
-                rotate(xd / 100, 0, yd / 100)
+            if (mode3d == true) {
+                // 3d mode rotates in-place instead of panning
+                var x = e.sourceEvent.clientX
+                var y = e.sourceEvent.clientY
+
+                var xd = lastx - x
+                var yd = y - lasty
+                lastx = x
+                lasty = y
+                if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
+                    rotate(xd / 100, 0, yd / 100, waypointCircles, "waypoints", "list")
+                    rotate(xd / 100, 0, yd / 100, label_array, "label", "obj")
+                }
             }
-            
+            else {
+                // 2d mode allows for panning
+                d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
+            }
+
+
         }
 
 
@@ -102,6 +119,10 @@ function updateChartWaypoints() {
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
         waypointCircles.push([xi, yi, zi])
+        if (entry.match == true) {
+            label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
+            anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
+        }
 
     })
 
@@ -111,31 +132,20 @@ function updateChartWaypoints() {
         .enter()
         .append("circle")
         .attr("class", "waypoints")
-        .attr("cx", function (d) {
+        .attr("cx", function (d, i) {
+            if (i == 0) console.log(x(d[0]))
             return x(d[0])
         })
         .attr("cy", function (d) {
-            return x(d[1])
+            return y(d[1])
         })
-        .attr("r", 7)
-        
+        .attr("r", waypointR)
+
         .attr("fill", "blue")
 
 
 
     // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
-
-    var label_array = []
-    var anchor_array = []
-    waypoints.forEach(entry => {
-        var xi = entry.coordinates[0]
-        var yi = entry.coordinates[1]
-        if (entry.match == true) {
-            label_array.push({ x: x(xi), y: y(yi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
-            anchor_array.push({ x: x(xi), y: y(yi), r: entry.size * 1.1 })
-        }
-
-    })
     var labels = svg.selectAll(".label")
         .data(label_array)
         .enter()
@@ -143,12 +153,16 @@ function updateChartWaypoints() {
         .attr("class", "label")
         .style("font-size", function (d) {
             if (mode3d == true) {
-                return Math.floor(5 + d.size) + "px" // not working
+                //return Math.floor(5 + d.size) + "px" // not working
+                return labelSize
             }
             else return labelSize
 
         })
-        .attr("x", function (d) { return d.x })
+        .attr("x", function (d, i) {
+            if (i == 0) console.log(d.x)
+             return d.x
+             })
         .attr("y", function (d) { return d.y })
         .text(function (d) { return d.name })
 
@@ -173,26 +187,29 @@ function updateChartWaypoints() {
 
     })
 
-    // Use d3-labeler library to move each label so that it doesn't overlap
-    d3.labeler()
-        .label(label_array)
-        .anchor(anchor_array)
-        .width(chartWidth)
-        .height(chartHeight)
-        .start(1000)
+    if (mode3d != true) {
+        // Use d3-labeler library to move each label so that it doesn't overlap
+        d3.labeler()
+            .label(label_array)
+            .anchor(anchor_array)
+            .width(chartWidth)
+            .height(chartHeight)
+            .start(1000)
 
 
-    labels
-        .transition()
-        .duration(1000)
-        .attr("x", function (d) { return d.x })
-        .attr("y", function (d) { return d.y })
+        labels
+            .transition()
+            .duration(1000)
+            .attr("x", function (d) { return d.x })
+            .attr("y", function (d) { return d.y })
 
-    links
-        .transition()
-        .duration(800)
-        .attr("x2", function (d) { return d.x; })
-        .attr("y2", function (d) { return d.y - 2; });
+        links
+            .transition()
+            .duration(800)
+            .attr("x2", function (d) { return d.x; })
+            .attr("y2", function (d) { return d.y - 2; });
+    }
+
 
 
 }
@@ -284,7 +301,8 @@ function updateChartUser(data, type) {
 
 
 
-function rotate(pitch, yaw, roll) {
+function rotate(pitch, yaw, roll, matrix, classname, type) {
+    
     var cosa = Math.cos(yaw);
     var sina = Math.sin(yaw);
 
@@ -306,29 +324,63 @@ function rotate(pitch, yaw, roll) {
     var Azy = cosb * sinc;
     var Azz = cosb * cosc;
 
-    for (var i = 0; i < waypointCircles.length; i++) {
-        var px = waypointCircles[i][0];
-        var py = waypointCircles[i][1];
-        var pz = waypointCircles[i][2];
+    // TODO: use matrix math library
+    //var m = math.matrix([[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]])
 
-        waypointCircles[i][0] = Axx * px + Axy * py + Axz * pz;
-        waypointCircles[i][1] = Ayx * px + Ayy * py + Ayz * pz;
-        waypointCircles[i][2] = Azx * px + Azy * py + Azz * pz;
+
+    for (var i = 0; i < matrix.length; i++) {
+        var px, py, pz
+
+        if (type == "list") {
+            px = matrix[i][0];
+            py = matrix[i][1];
+            pz = matrix[i][2];
+            matrix[i][0] = Axx * px + Axy * py + Axz * pz;
+            matrix[i][1] = Ayx * px + Ayy * py + Ayz * pz;
+            matrix[i][2] = Azx * px + Azy * py + Azz * pz;
+            var points = svg.selectAll("." + classname)
+
+                .attr("cx", function (d) {
+                    return x(d[0])
+                })
+                .attr("cy", function (d) {
+                    return y(d[1])
+                })
+                .attr("r", function (d) {
+                    //return z(d[2])
+                    return 10
+                })
+                .attr("z", function (d) { return z(d[2]) })
+        }
+        else {
+            px = x.invert(matrix[i].x);
+            py = y.invert(matrix[i].y);
+            pz = z.invert(matrix[i].z);
+            matrix[i].x = x(Axx * px + Axy * py + Axz * pz);
+            matrix[i].y = y(Ayx * px + Ayy * py + Ayz * pz);
+            matrix[i].z = z(Azx * px + Azy * py + Azz * pz);
+
+
+            var points = svg.selectAll("." + classname)
+                .attr("x", function (d) {
+                    return d.x
+                })
+                .attr("y", function (d) {
+                    return d.y
+                })
+
+        }
+
+
+
     }
-    svg.selectAll(".waypoints")
 
-        .attr("cx", function (d) {
-            return x(d[0])
-        })
-        .attr("cy", function (d) {
-            return x(d[1])
-        })
-        .attr("r", function(d)
-        {
-            return z(d[2])
-        })
+
+
 
 
 }
+
+
 
 

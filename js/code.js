@@ -7,7 +7,7 @@ var chartMargin = 30
 var x;
 var y;
 var z;
-var mode3d = true // 3-d mode makes the circles and labels change size according to z-axis value
+var mode3d = true // 3-d mode
 
 const minichartWidth = 200
 const minichartHeight = 200
