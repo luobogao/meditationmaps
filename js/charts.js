@@ -19,7 +19,7 @@ var y;
 var z;
 var opacity;
 var minx, maxx, miny, maxy, minz, maxz
-    
+
 
 
 function updateChartWaypoints() {
@@ -38,7 +38,7 @@ function updateChartWaypoints() {
 
         const zoom_type = e.sourceEvent.type
 
-        
+
         x = d3.scaleLinear()
             .domain([minx, maxx]) // input
             //.domain ([-500, 1000])
@@ -125,7 +125,7 @@ function updateChartWaypoints() {
     maxx = maxx * 2
     miny = miny * 2
     maxy = maxy * 2
-    
+
 
     // Make the min/max square
     if (Math.abs(minx) < maxx) minx = -1 * maxx
@@ -159,7 +159,7 @@ function updateChartWaypoints() {
         var zi = entry.coordinates[2]
         waypointCircles.push([xi, yi, zi])
         if (entry.match == true) {
-            label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
+            label_array.push({ x: xi, y: yi, z: zi, width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
 
@@ -178,7 +178,7 @@ function updateChartWaypoints() {
         .attr("cy", function (d) {
             return y(d[1])
         })
-        
+
         .attr("r", function (d) {
             return z(d[2])
 
@@ -197,22 +197,13 @@ function updateChartWaypoints() {
         .enter()
         .append("text")
         .attr("class", "label")
-        .style("font-size", function (d) {
-            if (mode3d == true) {
-                //return Math.floor(5 + d.size) + "px" // not working
-                return labelSize
-            }
-            else return labelSize
-
-        })
-        .attr("x", function (d, i) {
-            return d.x + waypointR
-        })
+        .attr("x", function (d, i) {return x(d.x + waypointR)})
+        .attr("y", function (d) { return y(d.y - waypointR)})
         .style("font-size", function (d, i) {
 
-            return Math.floor(d.z) + "px"
+            return Math.floor(z(d.z)) + "px"
         })
-        .attr("y", function (d) { return d.y - waypointR })
+
         .text(function (d) { return d.name })
 
     var links = svg.selectAll(".link")
@@ -249,8 +240,8 @@ function updateChartWaypoints() {
         labels
             .transition()
             .duration(1000)
-            .attr("x", function (d) { return d.x })
-            .attr("y", function (d) { return d.y })
+            .attr("x", function (d) { return x(d.x) })
+            .attr("y", function (d) { return y(d.y) })
 
         links
             .transition()
@@ -283,52 +274,50 @@ function updateChartUser(data, type) {
 
     var lineData = []
 
+    var data = []
+
 
     mapped.forEach(entry => {
 
 
         var moment = data[index]
-        var xi = x(entry[0])
-        var yi = y(entry[1])
-        var zi = z(entry[2])
+        var xi = entry[0]
+        var yi = entry[1]
+        var zi = entry[2]
 
         lineData.push([xi, yi])
-
-        if (type != "large") {
-            setTimeout(function () {
-                svg.append("circle")
-                    .attr("cx", xi)
-                    .attr("cy", yi)
-                    .attr("r", zi)
-                    .attr("seconds", moment.seconds) // store the seconds (x-value) so that circles can be filtered based on a specific second
-                    .attr("class", "userpoints")
-                    .attr("opacity", userOpacity)
-                    .attr("fill", "grey")
-                    .on("mouseover", function (d) {
-                        d3.select(this).style("opacity", 0.9)
-                        //console.log(moment.vector) 
-                        var marker = d3.select("#mini-marker")
-                        marker.attr("cx", x_mini(moment.seconds))
-
-
-                    })
-                    .on("click", function (d) {
-                        console.log(moment.vector)
-                    })
-                    .on("mouseout", function (d) {
-                        d3.select(this).style("opacity", userOpacity)
-                    })
-
-
-
-            }, index * (1000 / mapped.length))
-
-        }
-
-        index++
-
+        data.push({x: xi, y: yi, z: zi, moment: moment})
     })
 
+    if (type != "large") {
+
+        svg
+            .selectAll(".userpoints")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) { return x(d.x) })
+            .attr("cy", function (d) { return y(d.y) })
+            .attr("r", function(d){return z(d.z)})
+            .attr("seconds", function (d) {
+                return d.moment.seconds
+            })
+
+            .attr("class", "userpoints")
+            .attr("opacity", userOpacity)
+            .attr("fill", "grey")
+            .on("mouseover", function (d) {
+                d3.select(this).style("opacity", 0.9)
+                var marker = d3.select("#mini-marker")
+                
+            })
+            .on("click", function (d) {
+                console.log(moment.vector)
+            })
+            .on("mouseout", function (d) {
+                d3.select(this).style("opacity", userOpacity)
+            })
+    }
 
     if (type == "large") {
         setTimeout(function () {
@@ -409,24 +398,24 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
         else {
 
             // Labels
-            px = x.invert(matrix[i].x);
-            py = y.invert(matrix[i].y);
-            pz = z.invert(matrix[i].z);
-            matrix[i].x = x(Axx * px + Axy * py + Axz * pz);
-            matrix[i].y = y(Ayx * px + Ayy * py + Ayz * pz);
-            matrix[i].z = z(Azx * px + Azy * py + Azz * pz);
+            px = matrix[i].x
+            py = matrix[i].y
+            pz = matrix[i].z
+            matrix[i].x = Axx * px + Axy * py + Axz * pz
+            matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
+            matrix[i].z = Azx * px + Azy * py + Azz * pz
 
 
             svg.selectAll("." + classname)
                 .attr("x", function (d) {
-                    return d.x + d.z
+                    return x(d.x) + z(d.z)
                 })
                 .attr("y", function (d) {
-                    return d.y - d.z
+                    return y(d.y) - z(d.z) 
                 })
                 .style("font-size", function (d, i) {
 
-                    return Math.floor(d.z) + "px"
+                    return Math.floor(z(d.z)) + "px"
                 })
 
         }

@@ -1,5 +1,5 @@
 
-
+var backgroundColor = "white"
 var sidebarWidth = 300
 
 var chartWidth = window.innerWidth - sidebarWidth - 250
@@ -385,7 +385,7 @@ function setup() {
     var svg = d3.select("#chartsvg")
         .attr("width", chartWidth)
         .attr("height", chartHeight)
-        .style("background-color", "lightgrey")
+        .style("background-color", backgroundColor)
         .append("g")
         .attr("id", "chart")
         .attr("width", chartWidth - (2 * chartMargin))

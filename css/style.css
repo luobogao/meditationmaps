@@ -3,8 +3,6 @@ head {
 }
 body{
   font-family: Cabin;
-  background-color: #3e4042ff;
-  color: #f1f1f1;
   overflow: hidden;
 }
 .sidebar {
@@ -15,6 +13,7 @@ body{
   top: 0;
   left: 0;
   background-color: #111;
+  color: #818181;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
@@ -25,6 +24,7 @@ body{
   position: fixed;
   z-index: 1;
   top: 0;
+  color: #818181;
   right: 0;
   background-color: #111;
   overflow-x: hidden;
