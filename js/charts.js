@@ -11,12 +11,15 @@ var waypointCircles = []
 var svg;
 var label_array = []
 var anchor_array = []
+var linkSize = 1
+var labelSize = "14px"
+var waypointR = 10      // Size of waypoint circles
+var x;
+var y;
+var z;
+
 
 function updateChartWaypoints() {
-    var linkSize = 1
-    var labelSize = "14px"
-    var waypointR = 10
-    var stateSize = 10
     label_array = []
     anchor_array = []
     d3.select("#chart").selectAll("*").remove() // Clear everything
@@ -31,12 +34,14 @@ function updateChartWaypoints() {
         // When user zooms, all chart "g" elements are changed accordingly
 
         const zoom_type = e.sourceEvent.type
+        console.log("x: " + x(0))
 
-        
         if (zoom_type == "wheel") {
             // both 2d and 3d modes uses scroll wheel for zooming
-
+            e.transform.x = x(0)
+            e.transform.y = y(0)
             d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
+            
         }
         else {
 
@@ -160,10 +165,9 @@ function updateChartWaypoints() {
 
         })
         .attr("x", function (d, i) {
-            if (i == 0) console.log(d.x)
-             return d.x
+                         return d.x + waypointR
              })
-        .attr("y", function (d) { return d.y })
+        .attr("y", function (d) { return d.y - waypointR })
         .text(function (d) { return d.name })
 
     var links = svg.selectAll(".link")
@@ -353,6 +357,8 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
                 .attr("z", function (d) { return z(d[2]) })
         }
         else {
+
+            // Labels
             px = x.invert(matrix[i].x);
             py = y.invert(matrix[i].y);
             pz = z.invert(matrix[i].z);
@@ -363,10 +369,10 @@ function rotate(pitch, yaw, roll, matrix, classname, type) {
 
             var points = svg.selectAll("." + classname)
                 .attr("x", function (d) {
-                    return d.x
+                    return d.x + waypointR
                 })
                 .attr("y", function (d) {
-                    return d.y
+                    return d.y - waypointR
                 })
 
         }
