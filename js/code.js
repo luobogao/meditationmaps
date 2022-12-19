@@ -1,10 +1,17 @@
 
+
 var sidebarWidth = 300
 var chartWidth = 800
 var chartHeight = 500
 var chartMargin = 30
 var x;
 var y;
+var z;
+var mode3d = true // 3-d mode makes the circles and labels change size according to z-axis value
+
+const minichartWidth = 200
+const minichartHeight = 200
+const minichartMargin = 10
 
 const fontFamily = "Roboto, sans-serif"
 const textSizeLarge = 25
@@ -97,6 +104,7 @@ function averageRows(rows, roundN) {
 
                 })
             })
+
             newRow.vector = getRootVector(newRow) // Compute the averaged vector
 
             newRows.push(newRow)
@@ -207,11 +215,15 @@ function processMuseData(rows) {
     var standardRows = []
     for (var s = 0; s < total_seconds; s++) {
         let row = rows.filter(r => r.seconds == s)[0]
-        if (row) standardRows.push(row)
+
+        if (row) {
+            row.vector = getRootVector(row)
+            standardRows.push(row)
+        }
     }
 
     var lowResolution = 60   // average over 60 seconds
-    var highResolution = 10  // average over 10 seconds
+    var highResolution = 20  // average over 10 seconds
 
     // Long duration meditations should using longer rounding
     if (total_hours > 0.8) {
@@ -227,6 +239,7 @@ function processMuseData(rows) {
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
     }
+    state.raw = clone(standardRows)
     state.lowRes = averageLowRes
     state.highRes = averageHighRes
     state.avg10 = average10
@@ -243,49 +256,79 @@ function processMuseData(rows) {
         //console.log(getRootVector(entry)) show all vectors
     })
 
+    rebuildChart()
+
+}
+function rebuildChart() {
+    // Critical variables
+    const minimumMatch = 0.5 // filter out waypoints with a cosine similarity less than this 
+
+
     // re-build the Model using a few points from the user's data
     // Including user data like this helps to orient the chart 
-    var userVectors = average3.map(e => getRelativeVector(e.vector))
+    var userVectors = state.avg10.map(e => getRelativeVector(e.vector))
 
-    
+
     // Filter the waypoints by minimum distance from any of these test user vectors
+
     var distanceIds = {}
+
     userVectors.forEach(uservector => {
 
         waypoints.forEach(waypoint => {
             var waypoint_vector = getRelativeVector(waypoint.vector)
             var id = waypoint.id
             var distance = cosineSimilarity(uservector, waypoint_vector)
-            if (id in distanceIds)
-            {
-                if (distanceIds[id] < distance)
-                {
+            if (id in distanceIds) {
+                if (distanceIds[id] < distance) {
                     distanceIds[id] = distance
                 }
-                
+
             }
-            else
-                {
-                    distanceIds[id] = distance
-                }
-            
+            else {
+                distanceIds[id] = distance
+            }
+
         })
     })
     var maxd = Object.entries(distanceIds)
     maxd.sort(function (a, b) {
         return a[1] - b[1]
     })
-    var filtered_waypoint_ids = maxd.slice(2).map(e => e[0])
-    var filtered_waypoints = waypoints.filter(e => filtered_waypoint_ids.includes(e.id)).map(e => getRelativeVector(e.vector))
-    console.log("Using " + filtered_waypoints.length + " waypoints")
+    console.log("sorted matches:")
+    console.log(maxd)
+    var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
+
+    // Remove waypoints that have been selected for removal by the "removeN" standard
+    var filtered_waypoints_match = waypoints.filter(e => filtered_waypoint_ids.includes(e.id))
+    // Remove waypoints that have been de-selected by the user
+    var filtered_waypoints_user = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
+    var selected_waypoints = filtered_waypoints_user.map(e => getRelativeVector(e.vector))
+
+    console.log("Using " + selected_waypoints.length + " waypoints")
+
+    var ids = filtered_waypoints_user.map(e => e.id)
+
+    // Tag each waypoint (included filtered waypoints) as 'true' or 'false' match so that graph can remove filtered ones dynamically
+    waypoints.map(waypoint => {
+        if (ids.includes(waypoint.id)) {
+            waypoint.match = true
+        }
+        else waypoint.match = false
+    })
+
 
     // Combine the waypoints with the three user points
-    var allwaypoints = filtered_waypoints //.concat(userVectors)
-        
-    buildModel(allwaypoints)
-    updateChartWaypoints()
-    updateChartUser(state.highRes, "small")
-    updateChartUser(state.avg10, "large")
+    if (selected_waypoints.length == 0) {
+        alert("zero waypoints selected!")
+    }
+    else {
+        buildModel(selected_waypoints)
+        updateChartWaypoints()
+        updateChartUser(state.raw, "small")
+        updateChartUser(state.avg10, "large")
+        updateMiniChart(state.highRes)
+    }
 
 
 }
@@ -307,13 +350,12 @@ function buildModel(vectors) {
     // Build x-y points for each waypoint and store them
     let points = runModel(waypoints.map(e => getRelativeVector(e.vector)))
     var i = 0
-    waypoints.map(waypoint => 
-        {
-            waypoint.coordinates = points[i]
-            i ++
-        })
+    waypoints.map(waypoint => {
+        waypoint.coordinates = points[i]
+        i++
+    })
 
-    
+
 }
 function runModel(rows)
 // Takes rows of vectors calculated from the Muse data, and the principals (output from PCA function)
@@ -331,7 +373,7 @@ function setup() {
     // First-time setup of all the GUI sizes etc
 
     // Set full screen
-    chartWidth = window.innerWidth - sidebarWidth
+    chartWidth = window.innerWidth - sidebarWidth - 250
     chartHeight = window.innerHeight
 
     // Check if user is on a phone
@@ -343,13 +385,13 @@ function setup() {
     d3.select("#open_btn").style("position", "absolute").style("top", "10px").style("left", "10px")
 
     var svg = d3.select("#chartsvg")
-        .attr("width", chartWidth + (2 * chartMargin))
-        .attr("height", chartHeight + (2 * chartMargin))
+        .attr("width", chartWidth)
+        .attr("height", chartHeight)
         .style("background-color", "lightgrey")
         .append("g")
         .attr("id", "chart")
-        .attr("width", chartWidth)
-        .attr("height", chartHeight)
+        .attr("width", chartWidth - (2 * chartMargin))
+        .attr("height", chartHeight - (2 * chartMargin))
         .attr("transform", "translate(" + chartMargin + "," + chartMargin + ")")
 
     // Add the "browse" button
@@ -362,7 +404,76 @@ function setup() {
 
 
     // Immediately display a map of the waypoints when user loads page
+    waypoints.map(e => e.match = true) // For this splash chart, use all waypoints
     updateChartWaypoints()
+
+
+
+    // Mini-graph
+    d3.select("#minichart")
+        .style("background-color", "white")
+        .style("border", "1px solid black")
+        .style("border-radius", "3px")
+        .attr("width", minichartWidth + (2 * minichartMargin))
+        .attr("height", minichartHeight + (2 * minichartMargin))
+        .style("position", "absolute")
+        .style("right", "10px")
+        .style("bottom", "10px")
+        .append("g")
+        .attr("id", "minichartid")
+        .attr("width", minichartWidth + "px")
+        .attr("height", minichartHeight + "px")
+        .attr("transform", "translate(" + minichartMargin + "," + minichartMargin + ")")
+
+    buildSidebarRight()
+
+}
+function buildSidebarRight() {
+    // Right sidebar
+    var contributors = unique(waypoints.map(e => e.user))
+    state.model.selected_users = contributors
+
+    var div = d3.select("#sidebarRight")
+        .append("div")
+        .style("display", "flex")
+        .style("flex-direction", "column")
+
+    function addCheckbox(name) {
+        var checkboxDiv = div.append("div")
+            .style("margin", "8px")
+
+        checkboxDiv.append("input")
+            .attr("type", "checkbox")
+            .property("checked", true)
+            .on("click", function () {
+                const newState = this.checked
+
+                // Add or remove a name from the "Selected Users" list
+                // This action should prompt a rebuild of the model and a redrawing of the graph
+                if (newState == true) {
+                    state.model.selected_users.push(name)
+                }
+                else {
+                    var i = state.model.selected_users.indexOf(name)
+                    if (i != -1) {
+                        state.model.selected_users.splice(i, 1)
+                    }
+
+                }
+                console.log(state.model.selected_users)
+                rebuildChart()
+
+            })
+
+        checkboxDiv.append("label")
+            .text(name)
+
+    }
+    contributors.forEach(name => {
+        addCheckbox(name)
+    })
+
+
 
 }
 

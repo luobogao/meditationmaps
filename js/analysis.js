@@ -95,6 +95,10 @@ function pca(data)
 // Takes a matrix and finds a single 2-d vector which can generate a 2-d map of this data
 {
     console.log("Build PCA")
+    if (data.length == 0)
+    {
+        alert("calling PCA with no data!")
+    }
 
     // Starting matrix
     var matrix = clone(data)
@@ -129,22 +133,14 @@ function pca(data)
 
     // View the eigen values - largest indicate best match
     var total_values = d3.sum(eigen_values)
-    var top_2 = d3.sum(eigen_values.slice(-2))
-    var percent_match = Math.round(100 * top_2 / total_values)
-    console.log("--> Top two vector match " + percent_match + "% of variance")
+    const dimensions = 3 
+    var top = d3.sum(eigen_values.slice(-1 * dimensions))
+    var percent_match = Math.round(100 * top / total_values)
+    console.log("--> Top " + dimensions + " vector match " + percent_match + "% of variance")
 
     // Take only the two largest vectors (this involves taking the last two COLUMNS of EACH vector)
-    var take_2 = eigen_vectors.map(e => [e[e.length - 2], e[e.length - 1]])
-    var principals = math.transpose(take_2)
+    var take_N = eigen_vectors.map(e => [e[e.length - 1], e[e.length - 2], e[e.length - 3]])
+    var principals = math.transpose(take_N)
 
     return [principals, means]
-}
-function runModel(rows, principals, means)
-// Takes rows of vectors calculated from the Muse data, and the principals (output from PCA function)
-// Returns a list of x-y points, the location on 2-d space for each of those vectors
-
-{
-    var d = math.transpose(subtract_means(rows, means))
-    var mappedCoordinates = math.transpose(math.multiply(principals, d))
-    return mappedCoordinates
 }

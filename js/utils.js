@@ -1,3 +1,13 @@
+
+function unique(arr)
+{
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
+    return arr.filter(onlyUnique)
+}
+
+
 function ratio(x, y)
 {
     var opt1 = round ( 100.0 * ((x / y) - 1.0))
@@ -5,6 +15,15 @@ function ratio(x, y)
 
     if (x > y) return opt1
     else return opt2
+}
+function getEveryNth(arr, nth) {
+    const result = [];
+
+    for (let i = 0; i < arr.length; i += nth) {
+        result.push(arr[i]);
+    }
+
+    return result;
 }
 
 function parseTime (str)
