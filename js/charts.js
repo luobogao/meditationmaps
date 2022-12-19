@@ -20,12 +20,35 @@ function updateChartWaypoints() {
     let zoom = d3.zoom()
         .on('zoom', handleZoom);
 
+    var lastx = 0
+    var lasty = 0
     function handleZoom(e) {
         // When user zooms, all chart "g" elements are changed accordingly
-        d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
+        
+        const zoom_type = e.sourceEvent.type
+        if (zoom_type == "wheel") {
+            d3.select("#chartsvg").selectAll("g").attr("transform", e.transform)
+        }
+        else {
+            
+            var x = e.sourceEvent.clientX
+            var y = e.sourceEvent.clientY
+
+            var xd = lastx - x
+            var yd = y - lasty
+            lastx = x
+            lasty = y
+            if (Math.abs(xd) < 20 && Math.abs(yd)< 20)
+            {
+                rotate(xd / 100, 0, yd / 100)
+            }
+            
+        }
+
 
 
     }
+
 
 
     // Add a series of "g" containers to the SVG in order of "elevation"
@@ -35,6 +58,10 @@ function updateChartWaypoints() {
     var svg2 = d3.select("#chart").append("g").attr("id", "chart_standards")
 
     d3.select("#chartsvg").call(zoom)
+        .on("mousedown", function (d) {
+            console.log("clicked")
+        })
+
 
 
 
@@ -68,19 +95,7 @@ function updateChartWaypoints() {
     z = d3.scalePow()
         .exponent(1)
         .domain([minz, maxz])
-        .range([3, 15])
-
-
-    function add(xi, yi, size, color, opacity) {
-        svg2.append("circle")
-            .attr("cx", x(xi))
-            .attr("cy", y(yi))
-            .attr("r", size)
-            .attr("opacity", opacity)
-            .attr("fill", color)
-
-    }
-
+        .range([5, 10])
 
     waypoints.forEach(entry => {
         var xi = entry.coordinates[0]
@@ -103,6 +118,7 @@ function updateChartWaypoints() {
             return x(d[1])
         })
         .attr("r", 7)
+        
         .attr("fill", "blue")
 
 
@@ -268,7 +284,7 @@ function updateChartUser(data, type) {
 
 
 
-function rotate(pitch, roll, yaw) {
+function rotate(pitch, yaw, roll) {
     var cosa = Math.cos(yaw);
     var sina = Math.sin(yaw);
 
@@ -300,15 +316,19 @@ function rotate(pitch, roll, yaw) {
         waypointCircles[i][2] = Azx * px + Azy * py + Azz * pz;
     }
     svg.selectAll(".waypoints")
-        .transition()
+
         .attr("cx", function (d) {
             return x(d[0])
         })
         .attr("cy", function (d) {
             return x(d[1])
         })
-        .duration(100)
+        .attr("r", function(d)
+        {
+            return z(d[2])
+        })
+
 
 }
-setTimeout(function(){rotate(10, 10 ,10)}, 1000)
+
 
