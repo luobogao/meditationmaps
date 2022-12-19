@@ -18,7 +18,7 @@ var waypointR = 10      // Size of waypoint circles
 var x;
 var y;
 var z;
-var opacity;
+var opacityUser, opacityWaypoint;
 var minx, maxx, miny, maxy, minz, maxz
 
 
@@ -51,8 +51,7 @@ function updateChartWaypoints() {
             //.domain ([-500, 500])
             .range([chartHeight, 0])
 
-        z = d3.scalePow()
-            .exponent(1)
+        z = d3.scaleLinear()
             .domain([minz, maxz])
             .range([5, 10])
 
@@ -76,7 +75,7 @@ function updateChartWaypoints() {
                 var y = e.sourceEvent.clientY
 
                 var xd = lastx - x
-                var yd = y - lasty
+                var yd = lasty - y
                 lastx = x
                 lasty = y
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
@@ -153,17 +152,21 @@ function updateChartWaypoints() {
         .domain([minz, maxz])
         .range([5, 10])
 
-    opacity = d3.scaleLinear()
+    opacityWaypoint = d3.scaleLinear()
         .domain([5, 10])
-        .range([0.2, 1])
+        .range([0.4, 1])
+
+    opacityUser = d3.scaleLinear()
+        .domain([5, 10])
+        .range([0.1, 0.12])
 
     waypoints.forEach(entry => {
         var xi = entry.coordinates[0]
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
-        
+
         if (entry.match == true) {
-            waypointCircles.push({ x: xi, y: yi, z: zi})
+            waypointCircles.push({ x: xi, y: yi, z: zi })
             label_array.push({ x: xi, y: yi, z: zi, width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
@@ -189,8 +192,8 @@ function updateChartWaypoints() {
 
         })
         .style("opacity", function (d, i) {
-            
-            return opacity(z(d.z))
+
+            return opacityWaypoint(z(d.z))
         })
         .attr("fill", "blue")
 
@@ -385,7 +388,7 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
 
 
     if (type == "list") {
-        
+
         var points = svg.selectAll("." + classname)
             .attr("cx", function (d) {
                 return x(d.x)
@@ -394,12 +397,29 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
                 return y(d.y)
             })
             .attr("r", function (d) {
-                return z(d.z)
+                if (classname == "userpoints") {
+                    var size = z(d.z)
+                    if (size < 2) size = 2
+                    return size
+                }
+                else {
+                    return z(d.z)
+                }
+                
 
             })
             .style("opacity", function (d, i) {
 
-                return opacity(z(d[2]))
+
+                if (classname == "userpoints") {
+                    var opacity = opacityUser(z(d.z))
+                    if (opacity < 0.1) opacity = 0.1
+                    return opacity
+                }
+                else {
+                    return opacityWaypoint(z(d.z))
+                }
+
             })
 
             .attr("z", function (d) { return z(d.z) })
