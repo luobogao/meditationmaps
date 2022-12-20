@@ -18,7 +18,7 @@ function updateMiniChart(museData) {
         .domain([d3.min(yarray), d3.max(yarray)])
         .range([minichartHeight, 0])
 
-    
+
 
     var line = d3.line()
         // Basic line function - takes a list of points and plots them x-y, x-y one at a time
@@ -47,38 +47,43 @@ function updateMiniChart(museData) {
 
 
     svg
-    .append("svg:rect")
-    .attr("width", minichartWidth)
-    .attr("height", minichartHeight)
-    .attr('fill', 'none')
-    .attr('pointer-events', 'all')
-    .on("mouseout", function()
-    {
-        marker.style("display", "none")
-    })
-    .on("mousemove", function (mouse) {
-        // Reverse-calculate which second from the dataset the user is hovering over
-        const [x, y] = d3.pointer(mouse)
-        console.log(x)
-        const second = x_mini.invert(x) // invert the axis to get the seconds from the pixel value
-        let nearby = d3.selectAll(".userpoints")
-            .style("opacity", 0.02)
-            .filter(function () {
-                var this_second = d3.select(this).attr("seconds")
-                return this_second > second - 20 && this_second < second + 20
-            })
-        nearby.style("opacity", 1)
-        marker.attr("cx", x)
-        var matches = data.filter(e => e[0] > (second - 20))
-        if (matches.length > 0)
-        {
-            var ym = matches[0][1]
-            marker.attr("cy", y_mini(ym))
-            marker.style("display", "flex")
-        }
-        
+        .append("svg:rect")
+        .attr("width", minichartWidth)
+        .attr("height", minichartHeight)
+        .attr('fill', 'none')
+        .attr('pointer-events', 'all')
+        .on("mouseout", function () {
+            marker.style("display", "none")
+
+            d3.selectAll(".userpoints")
+                .style("opacity", function (d) {
+                    var opacity = opacityUser(z(d.z))
+                    if (opacity < 0.1) opacity = 0.1
+                    return opacity
+                })
+        })
+        .on("mousemove", function (mouse) {
+            // Reverse-calculate which second from the dataset the user is hovering over
+            const [x, y] = d3.pointer(mouse)
+            console.log(x)
+            const second = x_mini.invert(x) // invert the axis to get the seconds from the pixel value
+            let nearby = d3.selectAll(".userpoints")
+                .style("opacity", 0.02)
+                .filter(function () {
+                    var this_second = d3.select(this).attr("seconds")
+                    return this_second > second - 20 && this_second < second + 20
+                })
+            nearby.style("opacity", 1)
+            marker.attr("cx", x)
+            var matches = data.filter(e => e[0] > (second - 20))
+            if (matches.length > 0) {
+                var ym = matches[0][1]
+                marker.attr("cy", y_mini(ym))
+                marker.style("display", "flex")
+            }
 
 
-    })
+
+        })
 
 }

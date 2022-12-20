@@ -106,9 +106,6 @@ function updateChartWaypoints() {
     svg.selectAll("*").remove()
 
     d3.select("#chartsvg").call(zoom)
-        .on("mousedown", function (d) {
-            console.log("clicked")
-        })
 
 
 
@@ -147,8 +144,7 @@ function updateChartWaypoints() {
         //.domain ([-500, 500])
         .range([chartHeight, 0])
 
-    z = d3.scalePow()
-        .exponent(1)
+    z = d3.scaleLinear()
         .domain([minz, maxz])
         .range([5, 10])
 
@@ -196,6 +192,21 @@ function updateChartWaypoints() {
             return opacityWaypoint(z(d.z))
         })
         .attr("fill", "blue")
+        .on("click", function (i, d) {
+            // Toggle red/blue for selected waypoint
+            var selected = d3.select(this).attr("selected")
+            if (selected) {
+                d3.select(this).attr("fill", "blue")
+                    .attr("selected", false)
+            }
+            else {
+                d3.select(this).attr("fill", "red")
+                    .attr("selected", true)
+            }
+
+        }
+        )
+
 
 
 
@@ -265,6 +276,7 @@ function updateChartUser(data, type) {
 
     var userSize = 15
     var userOpacity = 0.1
+    var userPointColor = "black"
     if (type == "large") {
         userSize = 5
         userOpacity = 0.9
@@ -316,14 +328,25 @@ function updateChartUser(data, type) {
 
 
         .attr("opacity", userOpacity)
-        .attr("fill", "black")
+        .attr("fill", userPointColor)
         .on("mouseover", function (d) {
             d3.select(this).style("opacity", 0.9)
             var marker = d3.select("#mini-marker")
 
         })
-        .on("click", function (d) {
-            console.log(moment.vector)
+        .on("click", function (d, i) {
+            console.log(i)
+            // Toggle color for selected waypoint
+            var selected = d3.select(this).attr("selected")
+            if (selected) {
+                d3.select(this).attr("fill", userPointColor)
+                    .attr("selected", false)
+            }
+            else {
+                d3.select(this).attr("fill", "red")
+                    .attr("selected", true)
+            }
+
         })
         .on("mouseout", function (d) {
             d3.select(this).style("opacity", userOpacity)
@@ -399,13 +422,15 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
             .attr("r", function (d) {
                 if (classname == "userpoints") {
                     var size = z(d.z)
-                    if (size < 2) size = 2
+                    if (size < 5) size = 5
                     return size
                 }
                 else {
-                    return z(d.z)
+                    var size = z(d.z)
+                    if (size < 5) size = 5
+                    return size
                 }
-                
+
 
             })
             .style("opacity", function (d, i) {
@@ -417,7 +442,9 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
                     return opacity
                 }
                 else {
-                    return opacityWaypoint(z(d.z))
+                    var opacity = opacityWaypoint(z(d.z))
+                    if (opacity < 0.1) opacity = 0.1
+                    return opacity
                 }
 
             })

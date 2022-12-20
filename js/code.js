@@ -36,7 +36,8 @@ var state =
     "model":
     {
         "mapped": null, // Mapped x-y coordinates of each standard vector
-    }
+    },
+    "avg10": []
 
 }
 
@@ -263,44 +264,50 @@ function rebuildChart() {
     // Critical variables
     const minimumMatch = 0.5 // filter out waypoints with a cosine similarity less than this 
 
+    var filtered_waypoints_match = waypoints
 
-    // re-build the Model using a few points from the user's data
-    // Including user data like this helps to orient the chart 
-    var userVectors = state.avg10.map(e => getRelativeVector(e.vector))
+    // If user data has been uploaded, use it to find waypoints that don't have a good match, and remove them
+    if (state.avg10.length > 0) {
+        // re-build the Model using a few points from the user's data
+        // Including user data like this helps to orient the chart 
+
+        var userVectors = state.avg10.map(e => getRelativeVector(e.vector))
 
 
-    // Filter the waypoints by minimum distance from any of these test user vectors
+        // Filter the waypoints by minimum distance from any of these test user vectors
 
-    var distanceIds = {}
+        var distanceIds = {}
 
-    userVectors.forEach(uservector => {
+        userVectors.forEach(uservector => {
 
-        waypoints.forEach(waypoint => {
-            var waypoint_vector = getRelativeVector(waypoint.vector)
-            var id = waypoint.id
-            var distance = cosineSimilarity(uservector, waypoint_vector)
-            if (id in distanceIds) {
-                if (distanceIds[id] < distance) {
+            waypoints.forEach(waypoint => {
+                var waypoint_vector = getRelativeVector(waypoint.vector)
+                var id = waypoint.id
+                var distance = cosineSimilarity(uservector, waypoint_vector)
+                if (id in distanceIds) {
+                    if (distanceIds[id] < distance) {
+                        distanceIds[id] = distance
+                    }
+
+                }
+                else {
                     distanceIds[id] = distance
                 }
 
-            }
-            else {
-                distanceIds[id] = distance
-            }
-
+            })
         })
-    })
-    var maxd = Object.entries(distanceIds)
-    maxd.sort(function (a, b) {
-        return a[1] - b[1]
-    })
-    console.log("sorted matches:")
-    console.log(maxd)
-    var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
+        var maxd = Object.entries(distanceIds)
+        maxd.sort(function (a, b) {
+            return a[1] - b[1]
+        })
+        console.log("sorted matches:")
+        console.log(maxd)
+        var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
-    // Remove waypoints that have been selected for removal by the "removeN" standard
-    var filtered_waypoints_match = waypoints.filter(e => filtered_waypoint_ids.includes(e.id))
+        // Remove waypoints that have been selected for removal by the "removeN" standard
+        filtered_waypoints_match = waypoints.filter(e => filtered_waypoint_ids.includes(e.id))
+    }
+
     // Remove waypoints that have been de-selected by the user
     var filtered_waypoints_user = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
     var selected_waypoints = filtered_waypoints_user.map(e => getRelativeVector(e.vector))
@@ -325,8 +332,14 @@ function rebuildChart() {
     else {
         buildModel(selected_waypoints)
         updateChartWaypoints()
-        updateChartUser(state.highRes)
-        updateMiniChart(state.highRes)
+
+        // Update user data if it exists
+        if (state.avg10.length > 10)
+        {
+            updateChartUser(state.highRes)
+            updateMiniChart(state.highRes)  
+        }
+        
     }
 
 
