@@ -62,63 +62,76 @@ function averageRows(rows, roundN) {
     const channels = ["TP9", "TP10", "AF7", "AF8"]
     const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
 
-
+    console.log("Rounding with " + roundN + " in " + rows.length + " rows")
     roundN = Math.round(roundN)
-    const roundN_half = Math.round(roundN / 2)
-    let newRows = []
-    for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN_half) {
-        if (i < rows.length) {
-            let row = rows[i]
-            let newRow = {}
-            newRow.seconds = row.seconds
-            newRow.minutes = row.minutes
+    if (roundN == 1) {
+        console.log("ERROR: rounding is too low, using raw rows")
+        return rows
+    }
+    else {
+        const roundN_half = Math.round(roundN / 2)
+        let newRows = []
+        for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN_half) {
+            if (i < rows.length) {
+                let row = rows[i]
+                let newRow = {}
+                newRow.seconds = row.seconds
+                newRow.minutes = row.minutes
 
-            // Average each band + channel
-            bands.forEach(band => {
-                channels.forEach(channel => {
-                    let avgArray = []
-                    const key = band + "_" + channel // "Gamma_TP10"
+                // Average each band + channel
+                bands.forEach(band => {
+                    channels.forEach(channel => {
+                        let avgArray = []
+                        const key = band + "_" + channel // "Gamma_TP10"
 
-                    for (let a = i - roundN_half; a < i + roundN_half; a++) {
-                        var row = rows[a]
+                        for (let a = i - roundN_half; a < i + roundN_half; a++) {
+                            var row = rows[a]
 
-                        let val = row[key]
-                        if (!isNaN(val)) {
-                            avgArray.push(val)
+                            let val = row[key]
+                            if (!isNaN(val)) {
+                                avgArray.push(val)
+                            }
+
+                        }
+                        // If there are not enough valid values for an average, return NaN
+                        if (avgArray.length > roundN_half) {
+                            let avg = round(d3.quantile(avgArray, 0.5))
+                            let max = round(d3.quantile(avgArray, 0.95))
+                            let min = round(d3.quantile(avgArray, 0.05))
+                            newRow[key] = avg
+                            newRow[key + "_min"] = min
+                            newRow[key + "_max"] = max
+
+                        }
+                        else {
+
+                            newRow[key] = NaN
                         }
 
-                    }
-                    // If there are not enough valid values for an average, return NaN
-                    if (avgArray.length > roundN_half) {
-                        let avg = round(d3.quantile(avgArray, 0.5))
-                        let max = round(d3.quantile(avgArray, 0.95))
-                        let min = round(d3.quantile(avgArray, 0.05))
-                        newRow[key] = avg
-                        newRow[key + "_min"] = min
-                        newRow[key + "_max"] = max
-
-                    }
-                    else {
-
-                        newRow[key] = NaN
-                    }
-
+                    })
                 })
-            })
 
-            newRow.vector = getRootVector(newRow) // Compute the averaged vector
+                newRow.vector = getRootVector(newRow) // Compute the averaged vector
 
-            newRows.push(newRow)
+                newRows.push(newRow)
 
+            }
         }
+        return newRows
     }
-    return newRows
+
 }
 
 function processMuseData(rows) {
     // Cleans up and pre-processes the data from a Muse CSV
     // Removes blank rows, adds timestamps, removes rows where user is moving too much, then averages this data
 
+    if (rows.length > 100000)
+    {
+        alert("File is too large!")
+        return;
+    }
+    
     // Remove rows with blank data
     rows = rows.filter(row => row.Delta_TP9 || row.Theta_AF8 || row.Beta_AF7 || row.Gamma_TP10) // remove blank rows
 
@@ -222,6 +235,7 @@ function processMuseData(rows) {
             standardRows.push(row)
         }
     }
+    console.log("Standardized rows")
 
     var lowResolution = 60   // average over 60 seconds
     var highResolution = 20  // average over 10 seconds
@@ -235,7 +249,7 @@ function processMuseData(rows) {
     let averageHighRes = averageRows(clone(standardRows), highResolution)
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
     let average10 = averageRows(clone(standardRows), standardRows.length / 10)
-    let average3 = averageRows(clone(standardRows), standardRows.length / 3) // only used to compute some Waypoints for this user
+    let averageMax = averageRows(clone(standardRows), standardRows.length / 100)
 
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
@@ -244,7 +258,7 @@ function processMuseData(rows) {
     state.lowRes = averageLowRes
     state.highRes = averageHighRes
     state.avg10 = average10
-    state.avg3 = average3
+    state.averageMax = averageMax
 
     // Find the first and last timestamp for timeseries chart x-axis
     const first_seconds = standardRows[0].seconds
@@ -258,6 +272,7 @@ function processMuseData(rows) {
     })
 
     rebuildChart()
+
 
 }
 function rebuildChart() {
@@ -300,8 +315,8 @@ function rebuildChart() {
         maxd.sort(function (a, b) {
             return a[1] - b[1]
         })
-        console.log("sorted matches:")
-        console.log(maxd)
+        //console.log("sorted matches:")
+        //console.log(maxd)
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -333,13 +348,14 @@ function rebuildChart() {
         buildModel(selected_waypoints)
         updateChartWaypoints()
 
+
         // Update user data if it exists
-        if (state.avg10.length > 10)
-        {
-            updateChartUser(state.highRes)
-            updateMiniChart(state.highRes)  
+        if (state.avg10.length > 10) {
+            updateChartUser(state.averageMax)
+            updateMiniChart(state.highRes)
+
         }
-        
+
     }
 
 
@@ -434,6 +450,16 @@ function setup() {
         .attr("width", minichartWidth + "px")
         .attr("height", minichartHeight + "px")
         .attr("transform", "translate(" + minichartMargin + "," + minichartMargin + ")")
+
+    // Popup
+    d3.select("#popup")
+        .style("border-radius", "5px")
+        .style("opacity", 0.95)
+        .style("position", "absolute")
+        .style("background", "#404040")
+        .style("z-index", 10)
+        .style("color", "white")
+        .style("margin-right", "20px")
 
     buildSidebarRight()
 

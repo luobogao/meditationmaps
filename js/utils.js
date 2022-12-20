@@ -19,12 +19,22 @@ function ratio(x, y)
 function getEveryNth(arr, nth) {
     const result = [];
     nth = Math.floor(nth)
+    if (nth == 0) nth = 1
 
-    for (let i = 0; i < arr.length; i += nth) {
-        result.push(arr[i]);
+    if (nth == 1)
+    {
+        return arr
+    }
+    else
+    {
+        for (let i = 0; i < arr.length; i += nth) {
+            result.push(arr[i]);
+        }
+    
+        return result;
     }
 
-    return result;
+    
 }
 
 function parseTime (str)

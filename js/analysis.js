@@ -94,7 +94,7 @@ function pca(data)
 // Pricipal Component Analysis
 // Takes a matrix and finds a single 2-d vector which can generate a 2-d map of this data
 {
-    console.log("Build PCA")
+    
     if (data.length == 0)
     {
         alert("calling PCA with no data!")

@@ -12,13 +12,18 @@ var userCircles = []
 var svg;
 var label_array = []
 var anchor_array = []
+var labels, links
 var linkSize = 1
 var labelSize = "10px"
-var waypointR = 10      // Size of waypoint circles
+
+// 2D mode
+var waypointR = 8     // Size of waypoint circles
+var waypointOpacity = 1
+
 var x;
 var y;
 var z;
-var opacityUser, opacityWaypoint;
+var opacityUser, opacityWaypoint, opacityText
 var minx, maxx, miny, maxy, minz, maxz
 
 
@@ -31,7 +36,13 @@ function updateChartWaypoints() {
 
 
     let zoom = d3.zoom()
-        .on('zoom', handleZoom);
+        .on('zoom', handleZoom)
+        .on("start", function () {
+
+        })
+        .on("end", function () {
+
+        })
 
     var lastx = 0
     var lasty = 0
@@ -81,6 +92,7 @@ function updateChartWaypoints() {
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
                     rotate(xd / 100, 0, yd / 100, waypointCircles, "waypoints", "list", "chart_labels")
                     rotate(xd / 100, 0, yd / 100, label_array, "label", "obj", "chart_labels")
+                    rotate(xd / 100, 0, yd / 100, anchor_array, "link", "obj", "chart_labels")
                     rotate(xd / 100, 0, yd / 100, userCircles, "userpoints", "list", "chart_user")
                 }
             }
@@ -156,85 +168,55 @@ function updateChartWaypoints() {
         .domain([5, 10])
         .range([0.1, 0.12])
 
+    opacityText = d3.scaleLinear()
+        .domain([5, 10])
+        .range([0.4, 1])
+
     waypoints.forEach(entry => {
         var xi = entry.coordinates[0]
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
 
         if (entry.match == true) {
-            waypointCircles.push({ x: xi, y: yi, z: zi })
-            label_array.push({ x: xi, y: yi, z: zi, width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
+            waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry })
+            label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
 
     })
-    console.log("Adding waypoints: " + waypointCircles.length)
+    console.log("--> Adding waypoints: " + waypointCircles.length)
 
-    svg.selectAll(".waypoints")
-        .data(waypointCircles)
-        .enter()
-        .append("circle")
-        .attr("class", "waypoints")
-        .attr("cx", function (d, i) {
-            if (i == 0) console.log(x(d[0]))
-            return x(d.x)
-        })
-        .attr("cy", function (d) {
-            return y(d.y)
-        })
-
-        .attr("r", function (d) {
-            return z(d.z)
-
-        })
-        .style("opacity", function (d, i) {
-
-            return opacityWaypoint(z(d.z))
-        })
-        .attr("fill", "blue")
-        .on("click", function (i, d) {
-            // Toggle red/blue for selected waypoint
-            var selected = d3.select(this).attr("selected")
-            if (selected) {
-                d3.select(this).attr("fill", "blue")
-                    .attr("selected", false)
-            }
-            else {
-                d3.select(this).attr("fill", "red")
-                    .attr("selected", true)
-            }
-
-        }
-        )
-
-
-
+  
 
     // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
-    var labels = svg.selectAll(".label")
+    labels = svg.selectAll(".label")
         .data(label_array)
         .enter()
         .append("text")
         .attr("class", "label")
-        .attr("x", function (d, i) { return x(d.x + waypointR) })
-        .attr("y", function (d) { return y(d.y - waypointR) })
+        .attr("x", function (d, i) { return d.x })
+        .attr("y", function (d) { return d.y })
         .style("font-size", function (d, i) {
 
-            return Math.floor(z(d.z)) + "px"
+            if (mode3d == true) {
+                return Math.floor(d.z) + "px"
+            }
+            else return labelSize
+
         })
 
         .text(function (d) { return d.name })
 
-    var links = svg.selectAll(".link")
+    links = svg.selectAll(".link")
         .data(label_array)
         .enter()
         .append("line")
         .attr("class", "link")
         .attr("opacity", 0.2)
-        .attr("x1", function (d) { return (d.x); })
-        .attr("y1", function (d) { return (d.y); })
-        .attr("x2", function (d) { return (d.x); })
-        .attr("y2", function (d) { return (d.y); })
+        .attr("x1", function (d) { return d.x; })
+        .attr("y1", function (d) { return d.y; })
+        .attr("x2", function (d) { return d.x; })
+        .attr("y2", function (d) { return d.y; })
         .attr("stroke-width", linkSize)
         .attr("stroke", "black");
 
@@ -247,31 +229,119 @@ function updateChartWaypoints() {
     })
 
     if (mode3d != true) {
-        // Use d3-labeler library to move each label so that it doesn't overlap
-        d3.labeler()
-            .label(label_array)
-            .anchor(anchor_array)
-            .width(chartWidth)
-            .height(chartHeight)
-            .start(1000)
-
-
-        labels
-            .transition()
-            .duration(1000)
-            .attr("x", function (d) { return x(d.x) })
-            .attr("y", function (d) { return y(d.y) })
-
-        links
-            .transition()
-            .duration(800)
-            .attr("x2", function (d) { return d.x; })
-            .attr("y2", function (d) { return d.y - 2; });
+        adjustLabels()
     }
+
+    // ADD WAYPOINTS
+    svg.selectAll(".waypoints")
+    .data(waypointCircles)
+    .enter()
+    .append("circle")
+    .attr("class", "waypoints")
+    .attr("cx", function (d, i) {
+
+        return x(d.x)
+    })
+    .attr("cy", function (d) {
+        return y(d.y)
+    })
+
+    .attr("r", function (d) {
+        if (mode3d == true) {
+            return z(d.z)
+        }
+        else {
+            return waypointR
+        }
+
+
+    })
+    .style("stroke", function (d) {
+        if (mode3d == true) return "none"
+        else return "white"
+    }
+    )
+    .style("stroke-width", function (d) {
+        if (mode3d == true) return 0
+        else return 0.5
+    })
+    .style("opacity", function (d, i) {
+
+        if (mode3d == true) {
+            return opacityWaypoint(z(d.z))
+        }
+        else return waypointOpacity
+
+    })
+    .attr("fill", "blue")
+    .on("click", function (i, d) {
+        // Toggle red/blue for selected waypoint
+        var selected = d3.select(this).attr("selected")
+        if (selected) {
+            d3.select(this).attr("fill", "blue")
+                .attr("selected", false)
+        }
+        else {
+            d3.select(this).attr("fill", "red")
+                .attr("selected", true)
+        }
+
+    }
+    )
+    .on("mouseover", function (event, d) {
+        const note = d.fullentry.popup
+        const user = d.fullentry.user
+        var fullhtml = "<h2>" + user + "</h2>" + note
+        var x = event.pageX
+        var y = event.pageY
+        var popup = d3.select("#popup")
+        
+        popup
+            .style("display", "flex")                
+            //.style("width", "200px")
+            //.style("height", "100px")
+            .style("left", (x + 10) + "px")
+            .style("top", (y + 10) + "px")
+            .append("div").style("margin", "10px")
+            .html(fullhtml)
+            
+    })
+    .on("mouseout", function(event, d)
+    {
+        d3.select("#popup")          
+        .transition()
+            .style("display", "none")
+            .duration(100)
+            .selectAll("*").remove()
+    })
+
 
 
 
 }
+function adjustLabels() {
+    // Use d3-labeler library to move each label so that it doesn't overlap
+    d3.labeler()
+        .label(label_array)
+        .anchor(anchor_array)
+        .width(chartWidth)
+        .height(chartHeight)
+        .start(1000)
+
+
+    labels
+        .transition()
+        .duration(1000)
+        .attr("x", function (d) { return d.x })
+        .attr("y", function (d) { return d.y })
+
+    links
+        .transition()
+        .duration(1000)
+        .attr("x2", function (d) { return d.x; })
+        .attr("y2", function (d) { return d.y; });
+}
+
 function updateChartUser(data, type) {
 
     var userSize = 15
@@ -281,7 +351,7 @@ function updateChartUser(data, type) {
         userSize = 5
         userOpacity = 0.9
     }
-    console.log("type: " + type)
+
 
     var svg = d3.select("#chart_user")
     svg.selectAll("*").remove() // Clear last chart, if any
@@ -317,7 +387,7 @@ function updateChartUser(data, type) {
         .append("circle")
         .attr("class", "userpoints")
         .attr("cx", function (d, i) {
-            if (i == 0) console.log(x(d.x))
+
             return x(d.x)
         })
         .attr("cy", function (d) { return y(d.y) })
@@ -334,8 +404,11 @@ function updateChartUser(data, type) {
             var marker = d3.select("#mini-marker")
 
         })
-        .on("click", function (d, i) {
-            console.log(i)
+        .on("click", function (i, d) {
+            // Click on a user point
+
+            console.log("vector at this point:")
+            console.log(d.moment.vector)
             // Toggle color for selected waypoint
             var selected = d3.select(this).attr("selected")
             if (selected) {
@@ -382,9 +455,10 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
     // TODO: use matrix math library
     //var m = math.matrix([[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]])
 
-    var svg = d3.select("#" + svgid)
+
     for (var i = 0; i < matrix.length; i++) {
         var px, py, pz
+
 
         if (type == "list") {
 
@@ -399,74 +473,98 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
         else {
 
             // Labels
-            px = matrix[i].x
-            py = matrix[i].y
-            pz = matrix[i].z
-            matrix[i].x = Axx * px + Axy * py + Axz * pz
-            matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
-            matrix[i].z = Azx * px + Azy * py + Azz * pz
+            px = x.invert(matrix[i].x)
+            py = y.invert(matrix[i].y)
+            pz = z.invert(matrix[i].z)
+            matrix[i].x = x(Axx * px + Axy * py + Axz * pz)
+            matrix[i].y = y(Ayx * px + Ayy * py + Ayz * pz)
+            matrix[i].z = z(Azx * px + Azy * py + Azz * pz)
 
         }
     }
 
 
-    if (type == "list") {
+    // Move the SVGs to new rotated coordinates
+    if (classname != null) {
+        var svg = d3.select("#" + svgid)
+        if (type == "list") {
 
-        var points = svg.selectAll("." + classname)
-            .attr("cx", function (d) {
-                return x(d.x)
-            })
-            .attr("cy", function (d) {
-                return y(d.y)
-            })
-            .attr("r", function (d) {
-                if (classname == "userpoints") {
-                    var size = z(d.z)
-                    if (size < 5) size = 5
-                    return size
-                }
-                else {
-                    var size = z(d.z)
-                    if (size < 5) size = 5
-                    return size
-                }
+            var points = svg.selectAll("." + classname)
+                .attr("cx", function (d) {
+                    return x(d.x)
+                })
+                .attr("cy", function (d) {
+                    return y(d.y)
+                })
+                .attr("r", function (d) {
+                    if (classname == "userpoints") {
+                        var size = z(d.z)
+                        if (size < 5) size = 5
+                        return size
+                    }
+                    else {
+                        var size = z(d.z)
+                        if (size < 5) size = 5
+                        return size
+                    }
 
 
-            })
-            .style("opacity", function (d, i) {
+                })
+                .style("opacity", function (d, i) {
 
 
-                if (classname == "userpoints") {
-                    var opacity = opacityUser(z(d.z))
-                    if (opacity < 0.1) opacity = 0.1
+                    if (classname == "userpoints") {
+                        var opacity = opacityUser(z(d.z))
+                        if (opacity < 0.1) opacity = 0.1
+                        return opacity
+                    }
+                    else {
+                        var opacity = opacityWaypoint(z(d.z))
+                        if (opacity < 0.1) opacity = 0.1
+                        return opacity
+                    }
+
+                })
+
+                .attr("z", function (d) { return z(d.z) })
+        }
+        else {
+
+
+            svg.selectAll("." + classname)
+                .attr("x", function (d) {
+                    return d.x + d.z
+                })
+                .attr("y", function (d) {
+                    return d.y - d.z
+                })
+                .attr("x1", function (d) {
+                    return d.x
+                })
+                .attr("y1", function (d) {
+                    return d.y
+                })
+                .attr("x2", function (d) {
+                    return d.x
+                })
+                .attr("y2", function (d) {
+                    return d.y
+                })
+                .style("font-size", function (d, i) {
+
+                    return (5 + d.z) + "px"
+                })
+                .style("opacity", function (d) {
+                    var opacity = opacityText(d.z)
+                    if (opacity < 0.3) opacity = 0.3
                     return opacity
-                }
-                else {
-                    var opacity = opacityWaypoint(z(d.z))
-                    if (opacity < 0.1) opacity = 0.1
-                    return opacity
-                }
+                })
 
-            })
 
-            .attr("z", function (d) { return z(d.z) })
+        }
     }
-    else {
 
 
-        svg.selectAll("." + classname)
-            .attr("x", function (d) {
-                return x(d.x) + z(d.z)
-            })
-            .attr("y", function (d) {
-                return y(d.y) - z(d.z)
-            })
-            .style("font-size", function (d, i) {
-
-                return Math.floor(z(d.z)) + "px"
-            })
-
-    }
 }
 
 
