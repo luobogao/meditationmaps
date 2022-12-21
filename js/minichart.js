@@ -2,24 +2,26 @@ var x_mini;
 var y_mini;
 
 function updateMiniChart(museData) {
-    var data = getEveryNth(museData.map(e => [e.seconds, e.Gamma_TP10]), museData.length / 30)
-
+    
+    var data = museData.map(e => [e.seconds, e.Gamma_TP10])
     var svg = d3.select("#minichartid")
     svg.selectAll("*").remove()
 
     var xarray = data.map(e => e[0])
     var yarray = data.map(e => e[1])
 
+    console.log("mini: miny: " + d3.min(yarray) + " max: " + d3.max(yarray))
+
     x_mini = d3.scaleLinear()
         .domain([d3.min(xarray), d3.max(xarray)])
         .range([0, minichartWidth])
 
-    y_mini = d3.scaleLinear()
+    y_mini = d3.scaleLog()
         .domain([d3.min(yarray), d3.max(yarray)])
         .range([minichartHeight, 0])
 
 
-
+    data = getEveryNth(data, data.length / (minichartWidth /  2))
     var line = d3.line()
         // Basic line function - takes a list of points and plots them x-y, x-y one at a time
         .x(function (d, i) { return x_mini(d[0]); })

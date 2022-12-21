@@ -10,6 +10,7 @@ var line = d3.line()
 var waypointCircles = []
 var userCircles = []
 var svg;
+var zooming = false
 var label_array = []
 var anchor_array = []
 var labels, links
@@ -17,7 +18,7 @@ var linkSize = 1
 var labelSize = "10px"
 var labelColor = "black"
 var userSize = 15
-var userOpacity = 0.1
+var userOpacity = 1
 var userPointColor = "grey"
 var waypointColor = "blue"
 
@@ -41,7 +42,7 @@ function updateChartWaypoints() {
     d3.select("#chart").selectAll("*").remove() // Clear everything
 
 
-    var zooming = false // set to true when using is moving/zooming, to prevent popups
+    zooming = false // set to true when using is moving/zooming, to prevent popups
     let zoom = d3.zoom()
         .on('zoom', handleZoom)
         .on("start", function () {
@@ -58,21 +59,6 @@ function updateChartWaypoints() {
         // When user zooms, all chart "g" elements are changed accordingly
 
         const zoom_type = e.sourceEvent.type
-
-
-        x = d3.scaleLinear()
-            .domain([minx, maxx]) // input
-            //.domain ([-500, 1000])
-            .range([0, chartWidth]); // output
-
-        y = d3.scaleLinear()
-            .domain([miny, maxy])
-            //.domain ([-500, 500])
-            .range([chartHeight, 0])
-
-        z = d3.scaleLinear()
-            .domain([minz, maxz])
-            .range([5, 10])
 
 
 
@@ -131,8 +117,8 @@ function updateChartWaypoints() {
 
 
 
-
-    var standardCoordinates = waypoints.map(e => e.coordinates)
+    // Get min/max only from the selected waypoints
+    var standardCoordinates = waypoints.filter(e => e.exclude != true).filter(e=> e.match == true).map(e => e.coordinates)
 
 
     // Find the minimum and maxiumum range of the model, set the chart size a bit larger than those bounds
@@ -198,7 +184,7 @@ function updateChartWaypoints() {
 
         waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry })
         if (entry.match == true) {
-            
+
             label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
@@ -277,13 +263,12 @@ function updateChartWaypoints() {
 
 
         })
-        .style("display", function(d)
-        {
+        .style("display", function (d) {
             // Option: don't display a waypoint if 'match' is false
-            if (d.fullentry.match)return "flex"
+            if (d.fullentry.match) return "flex"
             else return "none"
         })
-        
+
         .style("stroke", function (d) {
             if (mode3d == true) return "none"
             else return "white"
@@ -301,11 +286,10 @@ function updateChartWaypoints() {
             else return waypointOpacity
 
         })
-        
-        .attr("fill", function(d)
-        {
+
+        .attr("fill", function (d) {
             // Option: don't display a waypoint if 'match' is false
-            if (d.fullentry.match)return waypointColor
+            if (d.fullentry.match) return waypointColor
             else return "red"
         })
         .on("click", function (i, d) {
@@ -328,7 +312,7 @@ function updateChartWaypoints() {
 
                 const user = d.fullentry.user
                 if (note == undefined) { note = "(No Notes)" }
-                var fullhtml = "<h2>" + user + "</h2>" + note
+                var fullhtml = "<h2>" + user + "</h2>" + note + "<br><br>" + d.fullentry.cosineSimiarity
                 var x = event.pageX
                 var y = event.pageY
                 var popup = d3.select("#popup")
@@ -405,6 +389,7 @@ function updateChartUser(data, type) {
     var lineData = []
 
     userCircles = []
+
     mapped.forEach(entry => {
 
 
@@ -416,7 +401,19 @@ function updateChartUser(data, type) {
 
         lineData.push([xi, yi])
         userCircles.push({ x: xi, y: yi, z: zi, moment: moment })
+
     })
+    //centerToUser()
+
+
+    svg.selectAll(".waypoints")
+        .attr("cx", function (d) { return x(d.x) })
+        .attr("cy", function (d) { return x(d.y) })
+
+    svg.selectAll(".label")
+        .attr("x", function (d) { return d.x })
+        .attr("y", function (d) { return d.y })
+
 
 
     // USER'S POINTS
@@ -439,9 +436,37 @@ function updateChartUser(data, type) {
 
         .attr("opacity", userOpacity)
         .attr("fill", userPointColor)
-        .on("mouseover", function (d) {
-            d3.select(this).style("opacity", 0.9)
-            var marker = d3.select("#mini-marker")
+        .on("mouseover", function (i, d) {
+
+            if (zooming != true) {
+                d3.select(this).style("opacity", 1).style("stroke", "black")
+
+                // Move the mini-chart marker to the same point
+                
+                var seconds = d.moment.seconds
+                                
+                var marker_y_matches = state.highRes.filter(e => e.seconds > seconds) // Find a datapoint matching this second
+                
+                if (marker_y_matches.length > 0) {
+                    var match = marker_y_matches[0]
+                    
+                    var marker_y = y_mini(match.Gamma_TP10)
+                    var marker_x = x_mini(match.seconds)
+                    console.log("x: " + marker_x + ", y: " + marker_y)
+                    d3.select("#mini-marker")
+                        .attr("cx", marker_x)
+                        .attr("cy", marker_y)
+                        .style("display", "flex")
+                }
+                else
+                {
+                    d3.select("#mini-marker").style("display", "none")
+                }
+
+
+
+            }
+
 
         })
         .on("click", function (i, d) {
@@ -462,7 +487,8 @@ function updateChartUser(data, type) {
 
         })
         .on("mouseout", function (d) {
-            d3.select(this).style("opacity", userOpacity)
+            d3.select(this).style("opacity", userOpacity).style("stroke", "none")
+            d3.select("#mini-marker").style("display", "none")
         })
 
 }
@@ -554,9 +580,10 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
 
 
                     if (classname == "userpoints") {
-                        var opacity = opacityUser(z(d.z))
-                        if (opacity < 0.1) opacity = 0.1
-                        return opacity
+                        //var opacity = opacityUser(z(d.z))
+                        //if (opacity < 0.1) opacity = 0.1
+                        //return opacity
+                        return userOpacity
                     }
                     else {
                         var opacity = opacityWaypoint(z(d.z))
@@ -613,6 +640,30 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
     }
 
 
+}
+
+function centerToUser()
+{
+    // Centers the view around the user's data center of gravity instead of the model origin
+    var center = centroid(userCircles)
+    var updates = [userCircles, waypointCircles]
+    updates.forEach(arr => {
+        arr.forEach(entry => {
+            entry.x = entry.x - center.x
+            entry.y = entry.y - center.y
+            entry.z = entry.z - center.z
+        })
+
+    })
+    var updates2 = [label_array, anchor_array]
+    updates2.forEach(arr => {
+        arr.forEach(entry => {
+            entry.x = x(x.invert(entry.x) - center.x)
+            entry.y = y(y.invert(entry.y) - center.y)
+            entry.z = z(z.invert(entry.z) - center.z)
+        })
+
+    })
 }
 
 

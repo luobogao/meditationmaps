@@ -1,4 +1,12 @@
-
+function centroid(matrix)
+{
+    
+    var center = {
+        x: d3.mean(matrix.map(e => e.x)), y: d3.mean(matrix.map(e => e.y)), z: d3.mean(matrix.map(e => e.z))
+    }
+    
+    return center
+}
 function unique(arr)
 {
     function onlyUnique(value, index, self) {

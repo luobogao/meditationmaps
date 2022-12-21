@@ -318,6 +318,35 @@ var waypoints =
             }
         },
         {
+            "id": "similarity_kaio_fruition3",
+            "label": "Fruition 3",
+            "color": "orange",
+            "user": "Kaio",
+            "exclude": true,
+            "vector": {
+                "Delta_TP9": 1.0037,
+                "Theta_TP9": 2.4226,
+                "Alpha_TP9": 4.6114,
+                "Beta_TP9": 1.8219,
+                "Gamma_TP9": 1.4876,
+                "Delta_TP10": 0.7894,
+                "Theta_TP10": 2.0628,
+                "Alpha_TP10": 4.3364,
+                "Beta_TP10": 2.1028,
+                "Gamma_TP10": 1.9029,
+                "Delta_AF7": 5.1161,
+                "Theta_AF7": 2.5165,
+                "Alpha_AF7": 2.5154,
+                "Beta_AF7": 1.5795,
+                "Gamma_AF7": 1.229,
+                "Delta_AF8": 0.5997,
+                "Theta_AF8": 0.5505,
+                "Alpha_AF8": 0.6407,
+                "Beta_AF8": 1.3066,
+                "Gamma_AF8": 1.6651
+              }
+        },
+        {
             "id": "similarity_nii_biaural",
             "user": "Nii",
             "label": "Binaural Beats",

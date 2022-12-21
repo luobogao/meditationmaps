@@ -19,6 +19,12 @@ const textSizeMed = 18
 const textSizeSmall = 12
 const channels = ["TP9", "TP10", "AF7", "AF8"]
 const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+const band_channels = []
+bands.forEach(band => {
+    channels.forEach(channel => {
+        band_channels.push(band + "_" + channel)
+    })
+})
 const rl_pairs = [["TP10", "TP9"], ["AF8", "AF7"]]
 const fb_pairs = [["TP9", "AF7"], ["TP10", "AF8"]]
 
@@ -64,6 +70,8 @@ function receivedFile() {
 
 function rebuildChart() {
     // Critical variables
+
+    
     
 
     var waypoints_include = waypoints //.filter(e => e.exclude != true) // remove manually excluded vectors
@@ -74,6 +82,13 @@ function rebuildChart() {
         // re-build the Model using a few points from the user's data
         // Including user data like this helps to orient the chart 
 
+        var variances = band_channels.map(key => d3.variance(state.avg10.map(e => e[key])))
+        if (!variances.every(e => e != 0))
+        {
+            alert("Bad data! Electrodes not attached right")
+            
+        }
+
         var userVectors = state.highRes.map(e => getRelativeVector(e.vector))
 
 
@@ -81,13 +96,16 @@ function rebuildChart() {
         var distanceIds = {}
         userVectors.forEach(uservector => {
 
-            waypoints_include.forEach(waypoint => {
+            waypoints.forEach(waypoint => {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = cosineSimilarity(uservector, waypoint_vector)
+                
                 if (id in distanceIds) {
+                    // This is the best match so far
                     if (distanceIds[id] < distance) {
                         distanceIds[id] = distance
+                        waypoint.cosineSimilarity = distance
                     }
 
                 }
@@ -103,7 +121,7 @@ function rebuildChart() {
         })
         //console.log("sorted matches:")
         //console.log(maxd)
-        const minimumMatch = 0.1 // filter out waypoints with a cosine similarity less than this 
+        const minimumMatch = 0.5 // filter out waypoints with a cosine similarity less than this 
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -113,7 +131,7 @@ function rebuildChart() {
     // Remove waypoints that have been de-selected by the user
     var filtered_waypoints_user = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
     var selected_waypoints = filtered_waypoints_user.map(e => getRelativeVector(e.vector))
-
+    
     console.log("Using " + selected_waypoints.length + " waypoints")
 
     var ids = filtered_waypoints_user.map(e => e.id)
@@ -134,12 +152,13 @@ function rebuildChart() {
     else {
         console.log("building model with " + selected_waypoints.length + " waypoints")
         buildModel(selected_waypoints)
+        
         updateChartWaypoints()
 
 
         // Update user data if it exists
         if (state.avg10.length > 10) {
-            updateChartUser(state.averageMax)
+            updateChartUser(state.lowRes)
             updateMiniChart(state.highRes)
 
         }
@@ -156,6 +175,7 @@ function buildModel(vectors) {
     // These vectors are the raw (but averaged) values for each band/channel
     // Okay to use a mix of the "standard" vectors plus a few user vectors
     // Does not return x-y points - for that, need to call "run model" using the parameters set by this function
+
 
     pca(vectors)
 
