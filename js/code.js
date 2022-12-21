@@ -66,21 +66,22 @@ function rebuildChart() {
     // Critical variables
     
 
-    var filtered_waypoints_match = waypoints
+    var waypoints_include = waypoints //.filter(e => e.exclude != true) // remove manually excluded vectors
+    var filtered_waypoints_match = waypoints_include
 
     // If user data has been uploaded, use it to find waypoints that don't have a good match, and remove them
     if (state.avg10.length > 0) {
         // re-build the Model using a few points from the user's data
         // Including user data like this helps to orient the chart 
 
-        var userVectors = state.avg10.map(e => getRelativeVector(e.vector))
+        var userVectors = state.highRes.map(e => getRelativeVector(e.vector))
 
 
         // Filter the waypoints by minimum distance from any of these test user vectors
         var distanceIds = {}
         userVectors.forEach(uservector => {
 
-            waypoints.forEach(waypoint => {
+            waypoints_include.forEach(waypoint => {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = cosineSimilarity(uservector, waypoint_vector)
@@ -102,11 +103,11 @@ function rebuildChart() {
         })
         //console.log("sorted matches:")
         //console.log(maxd)
-        const minimumMatch = 0.8 // filter out waypoints with a cosine similarity less than this 
+        const minimumMatch = 0.1 // filter out waypoints with a cosine similarity less than this 
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
-        filtered_waypoints_match = waypoints.filter(e => filtered_waypoint_ids.includes(e.id))
+        filtered_waypoints_match = waypoints_include.filter(e => filtered_waypoint_ids.includes(e.id))
     }
 
     // Remove waypoints that have been de-selected by the user
@@ -131,6 +132,7 @@ function rebuildChart() {
         alert("zero waypoints selected!")
     }
     else {
+        console.log("building model with " + selected_waypoints.length + " waypoints")
         buildModel(selected_waypoints)
         updateChartWaypoints()
 
@@ -198,7 +200,7 @@ function setup() {
 
     // Build model of meditation states using the "vectors.js" file
     // This first time, include ALL the waypoints
-    let vectors = waypoints.map(e => getRelativeVector(e.vector))
+    let vectors = waypoints.filter(e => e.exclude != true).map(e => getRelativeVector(e.vector))
     buildModel(vectors)
 
 

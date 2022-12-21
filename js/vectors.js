@@ -174,6 +174,7 @@ var waypoints =
         {
             "id": "similarity_steffan_nondual",
             "label": "Non-Dual",
+            "exclude": true,
             "user": "Steffan",
             "vector": {
                 "Delta_TP9": 1.6623,
@@ -262,6 +263,7 @@ var waypoints =
             "label": "Fruition",
             "color": "orange",
             "user": "Kaio",
+            "exclude": true,
             "vector": {
                 "Delta_TP9": 1.4179,
                 "Theta_TP9": 2.5472,
@@ -290,6 +292,7 @@ var waypoints =
             "id": "similarity_kaio_fruition2",
             "label": "Fruition 2",
             "color": "orange",
+            "exclude": true,
             "user": "Kaio",
             "vector": {
                 "Delta_TP9": 1.4477,
