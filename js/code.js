@@ -155,11 +155,7 @@ function buildModel(vectors) {
     // Okay to use a mix of the "standard" vectors plus a few user vectors
     // Does not return x-y points - for that, need to call "run model" using the parameters set by this function
 
-    var pca_data = pca(vectors)
-    var principals = pca_data[0]
-    var means = pca_data[1]
-    state.model.principals = principals
-    state.model.means = means
+    pca(vectors)
 
     // Build x-y points for each waypoint and store them
     let points = runModel(waypoints.map(e => getRelativeVector(e.vector)))
@@ -170,15 +166,6 @@ function buildModel(vectors) {
     })
 
 
-}
-function runModel(rows)
-// Takes rows of vectors calculated from the Muse data, and the principals (output from PCA function)
-// Returns a list of x-y points, the location on 2-d space for each of those vectors
-
-{
-    var d = math.transpose(subtract_means(rows, state.model.means))
-    var mappedCoordinates = math.transpose(math.multiply(state.model.principals, d))
-    return mappedCoordinates
 }
 
 

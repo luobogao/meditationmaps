@@ -9,6 +9,9 @@ function dot(a, b)
     return d
 
 }
+var means = []
+var maxes = []
+var principals = []
 
 function cosineSimilarity(a, b)
 // Cosine Similarity - used to find how similar to high-dimensional vectors are to each other
@@ -71,7 +74,7 @@ function covariance(x, y, matrix) {
     return c
 }
 
-function subtract_means(matrix, means)
+function subtract_means(matrix)
 // Note: Mean subtraction is a standard part of PCA analysis, but not necessary when the vectors are already standardized ratios
 
 // Subtracts the mean of each column from each value
@@ -107,10 +110,10 @@ function unit_scaling(matrix, maxes)
     }
     return unit_scaled_matrix
 }
-function covarianceMatrix(matrix, means, maxes)
+function covarianceMatrix(matrix)
 {
     // Subtract mean from each value in original matrix
-    var mean_subtracted_matrix = subtract_means(matrix, means)
+    var mean_subtracted_matrix = subtract_means(matrix)
     // Covariance matrix (find covariance of each value with each other value)
     var covariance_matrix = []
 
@@ -141,8 +144,8 @@ function pca(data)
 
     // Find means and maxes (of each column)
     // Used by various models to make the covariance matrix
-    var means = []
-    var maxes = []
+    means = [] // reset 
+    maxes = [] // rest
     for (var i = 0; i < matrix[0].length; i++) {
         let column = matrix.map(e => e[i])
         maxes.push(d3.max(column.map(e => Math.abs(e))))
@@ -151,7 +154,7 @@ function pca(data)
     }
     
 
-    var covariance_matrix = covarianceMatrix(matrix, means, maxes)
+    var covariance_matrix = covarianceMatrix(matrix)
 
     
     // Eigenvectors
@@ -168,7 +171,17 @@ function pca(data)
 
     // Take only the two largest vectors (this involves taking the last two COLUMNS of EACH vector)
     var take_N = eigen_vectors.map(e => [e[e.length - 1], e[e.length - 2], e[e.length - 3]])
-    var principals = math.transpose(take_N)
+    principals = math.transpose(take_N)
 
-    return [principals, means, maxes]
 }
+
+function runModel(rows)
+// Takes rows of vectors calculated from the Muse data, and the principals (output from PCA function)
+// Returns a list of x-y points, the location on 2-d space for each of those vectors
+
+{
+    var d = math.transpose(subtract_means(rows))
+    var mappedCoordinates = math.transpose(math.multiply(principals, d))
+    return mappedCoordinates
+}
+
