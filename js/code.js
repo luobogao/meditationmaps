@@ -86,6 +86,7 @@ function rebuildChart() {
         if (!variances.every(e => e != 0))
         {
             alert("Bad data! Electrodes not attached right")
+            return
             
         }
 
@@ -303,6 +304,9 @@ function buildSidebarRight() {
     contributors.forEach(name => {
         addCheckbox(name)
     })
+    var cameraMatrix = [[5, 0, 0, 0], [0, 5, 0, 0], [0, 0, 1, 0]]
+    console.log("CAMERA:")
+    console.log(math.multiply(cameraMatrix, [[10, 0], [10, 0], [10, 1], [1, 1]]))
 
 
 
