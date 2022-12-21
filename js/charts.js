@@ -196,8 +196,9 @@ function updateChartWaypoints() {
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
 
+        waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry })
         if (entry.match == true) {
-            waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry })
+            
             label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
             anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
         }
@@ -276,6 +277,13 @@ function updateChartWaypoints() {
 
 
         })
+        .style("display", function(d)
+        {
+            // Option: don't display a waypoint if 'match' is false
+            if (d.fullentry.match)return "flex"
+            else return "none"
+        })
+        
         .style("stroke", function (d) {
             if (mode3d == true) return "none"
             else return "white"
@@ -293,7 +301,13 @@ function updateChartWaypoints() {
             else return waypointOpacity
 
         })
-        .attr("fill", waypointColor)
+        
+        .attr("fill", function(d)
+        {
+            // Option: don't display a waypoint if 'match' is false
+            if (d.fullentry.match)return waypointColor
+            else return "red"
+        })
         .on("click", function (i, d) {
             // Toggle red/blue for selected waypoint
             var selected = d3.select(this).attr("selected")
@@ -555,39 +569,7 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
                 .attr("z", function (d) { return z(d.z) })
         }
         else if (type == "cube") {
-            svg.selectAll(".cube").remove()
-
-            svg.append("line")
-                .attr("class", "cube")
-                .attr("x1", x(cube[0].x))
-                .attr("y1", x(cube[0].y))
-                .attr("x2", x(cube[1].x))
-                .attr("y2", x(cube[1].y))
-                .attr("stroke", "black")
-
-            svg.append("line")
-                .attr("class", "cube")
-                .attr("x1", x(cube[1].x))
-                .attr("y1", x(cube[1].y))
-                .attr("x2", x(cube[2].x))
-                .attr("y2", x(cube[2].y))
-                .attr("stroke", "black")
-
-            svg.append("line")
-                .attr("class", "cube")
-                .attr("x1", x(cube[2].x))
-                .attr("y1", x(cube[2].y))
-                .attr("x2", x(cube[3].x))
-                .attr("y2", x(cube[3].y))
-                .attr("stroke", "black")
-
-            svg.append("line")
-                .attr("class", "cube")
-                .attr("x1", x(cube[3].x))
-                .attr("y1", x(cube[3].y))
-                .attr("x2", x(cube[0].x))
-                .attr("y2", x(cube[0].y))
-                .attr("stroke", "black")
+            // Placeholder for future "cube"
 
 
         }

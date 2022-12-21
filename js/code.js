@@ -64,7 +64,7 @@ function receivedFile() {
 
 function rebuildChart() {
     // Critical variables
-    const minimumMatch = 0.5 // filter out waypoints with a cosine similarity less than this 
+    
 
     var filtered_waypoints_match = waypoints
 
@@ -77,9 +77,7 @@ function rebuildChart() {
 
 
         // Filter the waypoints by minimum distance from any of these test user vectors
-
         var distanceIds = {}
-
         userVectors.forEach(uservector => {
 
             waypoints.forEach(waypoint => {
@@ -104,6 +102,7 @@ function rebuildChart() {
         })
         //console.log("sorted matches:")
         //console.log(maxd)
+        const minimumMatch = 0.8 // filter out waypoints with a cosine similarity less than this 
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard

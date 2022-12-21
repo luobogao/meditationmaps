@@ -72,21 +72,57 @@ function covariance(x, y, matrix) {
 }
 
 function subtract_means(matrix, means)
+// Note: Mean subtraction is a standard part of PCA analysis, but not necessary when the vectors are already standardized ratios
+
 // Subtracts the mean of each column from each value
 // required for PCA analysis, this standardizes rows prior to variance
 {
     
-    var mean_subtracted_matrix = []
+    // var mean_subtracted_matrix = []
+    // for (var r = 0; r < matrix.length; r++) {
+    //     var row = matrix[r]
+    //     var new_row = []
+    //     for (var c = 0; c < row.length; c++) {
+    //         var new_value = row[c] - means[c]
+    //         new_row.push(new_value)
+    //     }
+    //     mean_subtracted_matrix.push(new_row)
+    // }
+    // return mean_subtracted_matrix
+    
+    return matrix
+
+}
+function unit_scaling(matrix, maxes)
+{
+    var unit_scaled_matrix = []
     for (var r = 0; r < matrix.length; r++) {
         var row = matrix[r]
         var new_row = []
         for (var c = 0; c < row.length; c++) {
-            var new_value = row[c] - means[c]
+            var new_value = row[c] / maxes[c]
             new_row.push(new_value)
         }
-        mean_subtracted_matrix.push(new_row)
+        unit_scaled_matrix.push(new_row)
     }
-    return mean_subtracted_matrix
+    return unit_scaled_matrix
+}
+function covarianceMatrix(matrix, means, maxes)
+{
+    // Subtract mean from each value in original matrix
+    var mean_subtracted_matrix = subtract_means(matrix, means)
+    // Covariance matrix (find covariance of each value with each other value)
+    var covariance_matrix = []
+
+    for (var a = 0; a < matrix[0].length; a++) {
+        var new_row = []
+        for (var b = 0; b < matrix[0].length; b++) {
+            var c = covariance(a, b, mean_subtracted_matrix)
+            new_row.push(c)
+        }
+        covariance_matrix.push(new_row)
+    }
+    return covariance_matrix
 
 }
 
@@ -103,29 +139,21 @@ function pca(data)
     // Starting matrix
     var matrix = clone(data)
 
-    // Find mean (of each column)
+    // Find means and maxes (of each column)
+    // Used by various models to make the covariance matrix
     var means = []
+    var maxes = []
     for (var i = 0; i < matrix[0].length; i++) {
         let column = matrix.map(e => e[i])
-        let mean = d3.mean(column)
-        means.push(mean)
+        maxes.push(d3.max(column.map(e => Math.abs(e))))
+        means.push(d3.mean(column))
 
     }
     
-    // Subtract mean from each value in original matrix
-    var mean_subtracted_matrix = subtract_means(matrix, means)
-    // Covariance matrix (find covariance of each value with each other value)
-    var covariance_matrix = []
 
-    for (var a = 0; a < matrix[0].length; a++) {
-        var new_row = []
-        for (var b = 0; b < matrix[0].length; b++) {
-            var c = covariance(a, b, mean_subtracted_matrix)
-            new_row.push(c)
-        }
-        covariance_matrix.push(new_row)
-    }
+    var covariance_matrix = covarianceMatrix(matrix, means, maxes)
 
+    
     // Eigenvectors
     var e = math.eigs(covariance_matrix)
     var eigen_values = e.values
@@ -142,5 +170,5 @@ function pca(data)
     var take_N = eigen_vectors.map(e => [e[e.length - 1], e[e.length - 2], e[e.length - 3]])
     var principals = math.transpose(take_N)
 
-    return [principals, means]
+    return [principals, means, maxes]
 }
