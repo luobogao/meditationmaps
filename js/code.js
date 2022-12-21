@@ -1,5 +1,5 @@
 
-var backgroundColor = "white"
+var backgroundColor = "#d9d9d9"
 var sidebarWidth = 300
 
 var chartWidth = window.innerWidth - sidebarWidth - 250
@@ -224,7 +224,7 @@ function setup() {
 
     // Mini-graph
     d3.select("#minichart")
-        .style("background-color", "white")
+        .style("background-color", backgroundColor)
         .style("border", "1px solid black")
         .style("border-radius", "3px")
         .attr("width", minichartWidth + (2 * minichartMargin))

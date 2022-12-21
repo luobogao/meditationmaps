@@ -15,6 +15,12 @@ var anchor_array = []
 var labels, links
 var linkSize = 1
 var labelSize = "10px"
+var labelColor = "black"
+var userSize = 15
+var userOpacity = 0.1
+var userPointColor = "grey"
+var waypointColor = "blue"
+
 
 // 2D mode
 var waypointR = 8     // Size of waypoint circles
@@ -26,7 +32,7 @@ var z;
 var opacityUser, opacityWaypoint, opacityText
 var minx, maxx, miny, maxy, minz, maxz
 
-
+var cube;
 
 function updateChartWaypoints() {
     label_array = []
@@ -43,6 +49,7 @@ function updateChartWaypoints() {
         })
         .on("end", function () {
             zooming = false
+
         })
 
     var lastx = 0
@@ -95,6 +102,7 @@ function updateChartWaypoints() {
                     rotate(xd / 100, 0, yd / 100, label_array, "label", "obj", "chart_labels")
                     rotate(xd / 100, 0, yd / 100, anchor_array, "link", "obj", "chart_labels")
                     rotate(xd / 100, 0, yd / 100, userCircles, "userpoints", "list", "chart_user")
+                    rotate(xd / 100, 0, yd / 100, cube, "cube", "cube", "chart_cube")
                 }
             }
             else {
@@ -115,6 +123,7 @@ function updateChartWaypoints() {
     var svg_user = d3.select("#chart").append("g").attr("id", "chart_user")
     svg = d3.select("#chart").append("g").attr("id", "chart_labels")
     var svg2 = d3.select("#chart").append("g").attr("id", "chart_standards")
+    var svgcube = d3.select("#chart").append("g").attr("id", "chart_cube")
 
     svg.selectAll("*").remove()
 
@@ -134,10 +143,19 @@ function updateChartWaypoints() {
     minz = d3.min(standardCoordinates.map(e => e[2]))
     maxz = d3.max(standardCoordinates.map(e => e[2]))
 
+    cube = [
+        { x: minx, y: miny, z: minz },
+        { x: maxx, y: miny, z: minz },
+        { x: maxx, y: maxy, z: minz },
+        { x: minx, y: maxy, z: minz },
+
+    ]
+
     minx = minx * 2
     maxx = maxx * 2
     miny = miny * 2
     maxy = maxy * 2
+
 
 
     // Make the min/max square
@@ -167,7 +185,7 @@ function updateChartWaypoints() {
 
     opacityUser = d3.scaleLinear()
         .domain([5, 10])
-        .range([0.1, 0.12])
+        .range([0.3, 0.8])
 
     opacityText = d3.scaleLinear()
         .domain([5, 10])
@@ -195,6 +213,7 @@ function updateChartWaypoints() {
         .enter()
         .append("text")
         .attr("class", "label")
+        .style("fill", labelColor)
         .attr("x", function (d, i) { return d.x })
         .attr("y", function (d) { return d.y })
         .style("font-size", function (d, i) {
@@ -274,7 +293,7 @@ function updateChartWaypoints() {
             else return waypointOpacity
 
         })
-        .attr("fill", "blue")
+        .attr("fill", waypointColor)
         .on("click", function (i, d) {
             // Toggle red/blue for selected waypoint
             var selected = d3.select(this).attr("selected")
@@ -292,14 +311,14 @@ function updateChartWaypoints() {
         .on("mouseover", function (event, d) {
             if (zooming == false) {
                 var note = d.fullentry.popup
-                
+
                 const user = d.fullentry.user
-                if (note == undefined){note = "(No Notes)"}
+                if (note == undefined) { note = "(No Notes)" }
                 var fullhtml = "<h2>" + user + "</h2>" + note
                 var x = event.pageX
                 var y = event.pageY
                 var popup = d3.select("#popup")
-                
+
                 popup
                     .style("display", "flex")
                     //.style("width", "200px")
@@ -308,13 +327,17 @@ function updateChartWaypoints() {
                     .style("top", (y + 10) + "px")
                     .append("div").style("margin", "10px")
                     .html(fullhtml)
-            }            
+            }
 
 
         })
         .on("mouseout", function (event, d) {
-            
-                
+            d3.select("#popup")
+                .transition()
+                .style("display", "none")
+                .duration(100)
+                .selectAll("*").remove()
+
         })
 
 
@@ -346,9 +369,7 @@ function adjustLabels() {
 
 function updateChartUser(data, type) {
 
-    var userSize = 15
-    var userOpacity = 0.1
-    var userPointColor = "black"
+
     if (type == "large") {
         userSize = 5
         userOpacity = 0.9
@@ -357,6 +378,9 @@ function updateChartUser(data, type) {
 
     var svg = d3.select("#chart_user")
     svg.selectAll("*").remove() // Clear last chart, if any
+
+
+
 
     var vectors = data.map(e => getRelativeVector(e.vector))
 
@@ -381,7 +405,7 @@ function updateChartUser(data, type) {
     })
 
 
-
+    // USER'S POINTS
     svg
         .selectAll(".userpoints")
         .data(userCircles)
@@ -462,7 +486,7 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
         var px, py, pz
 
 
-        if (type == "list") {
+        if (type == "list" || type == "cube") {
 
             px = matrix[i].x
             py = matrix[i].y
@@ -530,6 +554,43 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
 
                 .attr("z", function (d) { return z(d.z) })
         }
+        else if (type == "cube") {
+            svg.selectAll(".cube").remove()
+
+            svg.append("line")
+                .attr("class", "cube")
+                .attr("x1", x(cube[0].x))
+                .attr("y1", x(cube[0].y))
+                .attr("x2", x(cube[1].x))
+                .attr("y2", x(cube[1].y))
+                .attr("stroke", "black")
+
+            svg.append("line")
+                .attr("class", "cube")
+                .attr("x1", x(cube[1].x))
+                .attr("y1", x(cube[1].y))
+                .attr("x2", x(cube[2].x))
+                .attr("y2", x(cube[2].y))
+                .attr("stroke", "black")
+
+            svg.append("line")
+                .attr("class", "cube")
+                .attr("x1", x(cube[2].x))
+                .attr("y1", x(cube[2].y))
+                .attr("x2", x(cube[3].x))
+                .attr("y2", x(cube[3].y))
+                .attr("stroke", "black")
+
+            svg.append("line")
+                .attr("class", "cube")
+                .attr("x1", x(cube[3].x))
+                .attr("y1", x(cube[3].y))
+                .attr("x2", x(cube[0].x))
+                .attr("y2", x(cube[0].y))
+                .attr("stroke", "black")
+
+
+        }
         else {
 
 
@@ -554,7 +615,10 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
                 })
                 .style("font-size", function (d, i) {
 
-                    return (5 + d.z) + "px"
+                    if (mode3d == true) {
+                        return Math.floor(d.z) + "px"
+                    }
+                    else return labelSize
                 })
                 .style("opacity", function (d) {
                     var opacity = opacityText(d.z)
