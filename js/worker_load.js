@@ -1,3 +1,5 @@
+
+// Workers need to import their own libraries
 importScripts("d3.min.js")
 importScripts("moment.min.js")
 importScripts("utils.js")
@@ -13,6 +15,7 @@ bands.forEach(band => {
     })
 })
 
+// Listen for the main app to send a full string of a loaded file
 self.addEventListener("message", function(e) {
     var filestring = e.data
     let data = d3.csvParse(filestring)
@@ -28,12 +31,15 @@ function processMuseData(rows) {
     // Cleans up and pre-processes the data from a Muse CSV
     // Removes blank rows, adds timestamps, removes rows where user is moving too much, then averages this data
 
-    var returnObj = {}
+
     if (rows.length > 100000)
     {
         alert("File is too large!")
         return;
     }
+    // This object will hold all the resulting data, then be stringified and passed back to app
+    var returnObj = {}
+
     
     // Remove rows with blank data
     rows = rows.filter(row => row.Delta_TP9 || row.Theta_AF8 || row.Beta_AF7 || row.Gamma_TP10) // remove blank rows

@@ -65,8 +65,8 @@ function updateMiniChart(museData) {
         .on("mousemove", function (mouse) {
             // Reverse-calculate which second from the dataset the user is hovering over
             const [x, y] = d3.pointer(mouse)
-            console.log(x)
             const second = x_mini.invert(x) // invert the axis to get the seconds from the pixel value
+            if (y > (chartHeight * 0.6)) y = (chartHeight * 0.2)
             let nearby = d3.selectAll(".userpoints")
                 .style("opacity", 0.02)
                 .filter(function () {

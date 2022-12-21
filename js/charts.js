@@ -35,13 +35,14 @@ function updateChartWaypoints() {
     d3.select("#chart").selectAll("*").remove() // Clear everything
 
 
+    var zooming = false // set to true when using is moving/zooming, to prevent popups
     let zoom = d3.zoom()
         .on('zoom', handleZoom)
         .on("start", function () {
-
+            zooming = true
         })
         .on("end", function () {
-
+            zooming = false
         })
 
     var lastx = 0
@@ -186,7 +187,7 @@ function updateChartWaypoints() {
     })
     console.log("--> Adding waypoints: " + waypointCircles.length)
 
-  
+
 
     // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
     labels = svg.selectAll(".label")
@@ -234,86 +235,87 @@ function updateChartWaypoints() {
 
     // ADD WAYPOINTS
     svg.selectAll(".waypoints")
-    .data(waypointCircles)
-    .enter()
-    .append("circle")
-    .attr("class", "waypoints")
-    .attr("cx", function (d, i) {
+        .data(waypointCircles)
+        .enter()
+        .append("circle")
+        .attr("class", "waypoints")
+        .attr("cx", function (d, i) {
 
-        return x(d.x)
-    })
-    .attr("cy", function (d) {
-        return y(d.y)
-    })
+            return x(d.x)
+        })
+        .attr("cy", function (d) {
+            return y(d.y)
+        })
 
-    .attr("r", function (d) {
-        if (mode3d == true) {
-            return z(d.z)
+        .attr("r", function (d) {
+            if (mode3d == true) {
+                return z(d.z)
+            }
+            else {
+                return waypointR
+            }
+
+
+        })
+        .style("stroke", function (d) {
+            if (mode3d == true) return "none"
+            else return "white"
         }
-        else {
-            return waypointR
+        )
+        .style("stroke-width", function (d) {
+            if (mode3d == true) return 0
+            else return 0.5
+        })
+        .style("opacity", function (d, i) {
+
+            if (mode3d == true) {
+                return opacityWaypoint(z(d.z))
+            }
+            else return waypointOpacity
+
+        })
+        .attr("fill", "blue")
+        .on("click", function (i, d) {
+            // Toggle red/blue for selected waypoint
+            var selected = d3.select(this).attr("selected")
+            if (selected) {
+                d3.select(this).attr("fill", "blue")
+                    .attr("selected", false)
+            }
+            else {
+                d3.select(this).attr("fill", "red")
+                    .attr("selected", true)
+            }
+
         }
+        )
+        .on("mouseover", function (event, d) {
+            if (zooming == false) {
+                var note = d.fullentry.popup
+                
+                const user = d.fullentry.user
+                if (note == undefined){note = "(No Notes)"}
+                var fullhtml = "<h2>" + user + "</h2>" + note
+                var x = event.pageX
+                var y = event.pageY
+                var popup = d3.select("#popup")
+                
+                popup
+                    .style("display", "flex")
+                    //.style("width", "200px")
+                    //.style("height", "100px")
+                    .style("left", (x + 10) + "px")
+                    .style("top", (y + 10) + "px")
+                    .append("div").style("margin", "10px")
+                    .html(fullhtml)
+            }            
 
 
-    })
-    .style("stroke", function (d) {
-        if (mode3d == true) return "none"
-        else return "white"
-    }
-    )
-    .style("stroke-width", function (d) {
-        if (mode3d == true) return 0
-        else return 0.5
-    })
-    .style("opacity", function (d, i) {
-
-        if (mode3d == true) {
-            return opacityWaypoint(z(d.z))
-        }
-        else return waypointOpacity
-
-    })
-    .attr("fill", "blue")
-    .on("click", function (i, d) {
-        // Toggle red/blue for selected waypoint
-        var selected = d3.select(this).attr("selected")
-        if (selected) {
-            d3.select(this).attr("fill", "blue")
-                .attr("selected", false)
-        }
-        else {
-            d3.select(this).attr("fill", "red")
-                .attr("selected", true)
-        }
-
-    }
-    )
-    .on("mouseover", function (event, d) {
-        const note = d.fullentry.popup
-        const user = d.fullentry.user
-        var fullhtml = "<h2>" + user + "</h2>" + note
-        var x = event.pageX
-        var y = event.pageY
-        var popup = d3.select("#popup")
-        
-        popup
-            .style("display", "flex")                
-            //.style("width", "200px")
-            //.style("height", "100px")
-            .style("left", (x + 10) + "px")
-            .style("top", (y + 10) + "px")
-            .append("div").style("margin", "10px")
-            .html(fullhtml)
+        })
+        .on("mouseout", function (event, d) {
             
-    })
-    .on("mouseout", function(event, d)
-    {
-        d3.select("#popup")          
-        .transition()
-            .style("display", "none")
-            .duration(100)
-            .selectAll("*").remove()
-    })
+                
+        })
 
 
 
