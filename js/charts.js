@@ -147,21 +147,28 @@ function updateChartWaypoints() {
 
 
     // Make the min/max square
-    if (Math.abs(minx) < maxx) minx = -1 * maxx
-    else maxx = -1 * minx
-    if (Math.abs(miny) < maxy) miny = -1 * maxy
-    else maxy = -1 * miny
+    
+    // if (Math.abs(minx) < maxx) minx = -1 * maxx
+    // else maxx = -1 * minx
+    // if (Math.abs(miny) < maxy) miny = -1 * maxy
+    // else maxy = -1 * miny
+
+    minx = -10
+    maxx = 10
+    miny = -10
+    maxy = 10
+    console.log("ACTUAL WIDTH:" + chartHeight)
 
     // These D3 functions return the properly scaled x and y coordinates
     x = d3.scaleLinear()
         .domain([minx, maxx]) // input
         //.domain ([-500, 1000])
-        .range([0, chartWidth]); // output
+        .range([0, chartWidth - 30]); // output
 
     y = d3.scaleLinear()
         .domain([miny, maxy])
         //.domain ([-500, 500])
-        .range([chartHeight, 0])
+        .range([chartHeight - 100, 0])
 
     z = d3.scaleLinear()
         .domain([-10, 10])
@@ -170,6 +177,8 @@ function updateChartWaypoints() {
     fontScale = d3.scaleLinear()
         .domain([-10, 10])
         .range([8, 12])
+
+    console.log(y(0))
 
 
 
