@@ -120,9 +120,9 @@ function rebuildChart() {
         maxd.sort(function (a, b) {
             return a[1] - b[1]
         })
-        //console.log("sorted matches:")
-        //console.log(maxd)
-        const minimumMatch = 0.5 // filter out waypoints with a cosine similarity less than this 
+        console.log("sorted matches:")
+        console.log(maxd)
+        const minimumMatch = 0.8 // filter out waypoints with a cosine similarity less than this 
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -305,9 +305,7 @@ function buildSidebarRight() {
         addCheckbox(name)
     })
     var cameraMatrix = [[5, 0, 0, 0], [0, 5, 0, 0], [0, 0, 1, 0]]
-    console.log("CAMERA:")
-    console.log(math.multiply(cameraMatrix, [[10, 0], [10, 0], [10, 1], [1, 1]]))
-
+    
 
 
 }
