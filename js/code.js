@@ -127,7 +127,10 @@ function rebuildChart() {
             return a[1] - b[1]
         })
         console.log("Best Match:")
-        console.log(maxd[maxd.length - 1])
+        var bestMatch = maxd[maxd.length - 1]
+        console.log(bestMatch)
+        var bestFullMatch = waypoints.filter(e => e.id ==  bestMatch[0])[0]
+        console.log(bestFullMatch)
 
         const minimumMatch = 0.8
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
