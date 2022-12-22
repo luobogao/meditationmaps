@@ -8,6 +8,7 @@ importScripts("analysis.js")
 
 const channels = ["TP9", "TP10", "AF7", "AF8"]
 const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+const bands_mindlink = ["delta", "theta", "alphaLow", "alphaHigh", "betaLow", "betaHigh", "gammaLow", "gammaMid"]
 const band_channels = []
 bands.forEach(band => {
     channels.forEach(channel => {
@@ -16,31 +17,39 @@ bands.forEach(band => {
 })
 
 // Listen for the main app to send a full string of a loaded file
-self.addEventListener("message", function(e) {
+self.addEventListener("message", function (e) {
     var filestring = e.data
     let data = d3.csvParse(filestring)
     let headers = data.slice(-1)[0]
     let rows = data.slice(0, data.length - 1)
     let keys = Object.keys(rows[0])
-    processMuseData(rows)
+    if (keys.includes("timestampMs")) {
+        processDataMindLink(rows, "data1")
+    }
+    else {
+        processDataMuse(rows)
+
+    }
+
 
 }, false);
 
 
-function processMuseData(rows) {
+
+
+function processDataMuse(rows) {
     // Cleans up and pre-processes the data from a Muse CSV
     // Removes blank rows, adds timestamps, removes rows where user is moving too much, then averages this data
 
 
-    if (rows.length > 100000)
-    {
+    if (rows.length > 100000) {
         alert("File is too large!")
         return;
     }
     // This object will hold all the resulting data, then be stringified and passed back to app
     var returnObj = {}
 
-    
+
     // Remove rows with blank data
     rows = rows.filter(row => row.Delta_TP9 || row.Theta_AF8 || row.Beta_AF7 || row.Gamma_TP10) // remove blank rows
 
@@ -49,7 +58,7 @@ function processMuseData(rows) {
         alert("No data!")
     }
 
-    console.log("Loading " + rows.length + " rows")
+    console.log("--> Loading " + rows.length + " rows")
 
     // First timestamp - used to define the start time of this meditation
     let first_timestamp = parseTime(rows[0].TimeStamp)
@@ -128,7 +137,7 @@ function processMuseData(rows) {
 
     // Remove last 10 seconds and first 10 seconds - user is probably moving during this time
     rows = rows.slice(10, rows.length - 10)
-    console.log("Validated rows: " + rows.length)
+    console.log("--> Validated rows: " + rows.length)
 
     let last_timestamp = parseTime(rows.slice(-1)[0].TimeStamp)
     let total_seconds = Math.round((last_timestamp - first_timestamp) / 1000)
@@ -144,7 +153,7 @@ function processMuseData(rows) {
             standardRows.push(row)
         }
     }
-    console.log("Standardized rows")
+    console.log("--> Standardized rows")
 
     var lowResolution = 60   // average over 60 seconds
     var highResolution = 10  // average over 10 seconds
@@ -159,12 +168,12 @@ function processMuseData(rows) {
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
     let average10 = averageRows(clone(standardRows), standardRows.length / 10)
     let averageMax = averageRows(clone(standardRows), standardRows.length / 100)
-    
+
 
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
     }
-    
+
     returnObj.raw = clone(standardRows)
     returnObj.lowRes = averageLowRes
     returnObj.highRes = averageHighRes
@@ -189,8 +198,8 @@ function processMuseData(rows) {
 
 function averageRows(rows, roundN) {
 
-    
-    console.log("Rounding with " + roundN + " in " + rows.length + " rows")
+
+    console.log("----> Rounding with " + roundN + " in " + rows.length + " rows")
     roundN = Math.round(roundN)
     if (roundN <= 1) {
         console.log("ERROR: rounding is too low, using raw rows")
@@ -247,5 +256,117 @@ function averageRows(rows, roundN) {
         }
         return newRows
     }
+
+}
+
+// Mind Link
+function processDataMindLink(rows) {
+    let first_timestamp = parseInt(rows[0].timestampMs)
+    let f = "YYYY-MM-DD HH:mm "
+    let d = moment(first_timestamp).format(f)
+    
+    var returnObj = {}
+    returnObj.filename = d
+    returnObj.date = d
+
+
+    // Clean Data
+    for (let r = 0; r < rows.length; r++) {
+        let row = rows[r]
+
+        // "2022-09-22 17:00:02"
+        let timestamp = row.timestampMs
+        row.valid = true
+        if (row.poorSignal > 1) row.valid = false
+        if (row.timestampMs == "timestampMs") row.valid = false
+        row.seconds = Math.round((timestamp - first_timestamp) / 1000)
+        row.secondsFull = Math.round(timestamp / 1000)
+        row.minutes = Math.round(row.seconds / 60)
+
+        row.tag = row.tagEvent
+
+    }
+    console.log("--> Removing " + rows.filter(row => row.valid == false).length + " invalid rows")
+    rows = rows.filter(row => row.valid == true)
+    
+
+    let last_timestamp = rows.slice(-1)[0].timestampMs
+    let total_seconds = Math.round((last_timestamp - first_timestamp) / 1000)
+    let standardRows = []
+    for (var s = 0; s < total_seconds; s++) {
+        let row = rows.filter(r => r.seconds == s)[0]
+        if (row) standardRows.push(row)
+    }
+
+    let avgLow = averageRowsMindLink(clone(standardRows), 60)
+    let avgHigh = averageRowsMindLink(clone(standardRows), 10)
+    let avgMax = averageRowsMindLink(clone(standardRows), standardRows.length / 100)
+    let avg10 = averageRowsMindLink(clone(standardRows), standardRows.length / 10)
+    
+    returnObj.raw = clone(standardRows)
+    returnObj.lowRes = avgLow
+    returnObj.highRes = avgHigh
+    returnObj.avg10 = avg10
+    returnObj.averageMax = avgMax
+    postMessage(JSON.stringify(returnObj))
+    
+}
+function averageRowsMindLink(rows, roundN) {
+
+    let roundN2 = Math.round(roundN / 2)
+    if (roundN2 <= 1)
+    {
+        return rows
+    }
+    let newRows = []
+
+    if (roundN2 < 1) { roundN2 = 1; roundN = 2 }
+
+    for (let i = roundN2 + 1; i < rows.length - roundN2 - 5; i = i + roundN2) {
+        let newRow = {}
+        let seconds = rows[i].seconds
+        let minutes = rows[i].minutes
+        newRow.seconds = seconds
+        newRow.minutes = minutes
+        newRow.tag = rows[i].tag
+
+        let rawSeconds = rows[i].secondsFull
+        let roundedSeconds = Math.round(rawSeconds / roundN2) * roundN2
+        newRow.secondsFull = roundedSeconds
+
+        bands_mindlink.forEach(band => {
+            let avgArray = []
+            for (let a = i - roundN2; a < i + roundN2; a++) {
+
+                let val = parseInt(rows[a][band])
+
+
+                if (rows[a].valid) {
+
+                    if (val > 0 && val < 20000) avgArray.push(val)
+                }
+
+            }
+
+            if (avgArray.length > 0) {
+
+
+                let avg = round(d3.quantile(avgArray, 0.5))
+                let max = round(d3.quantile(avgArray, 0.95))
+                let min = round(d3.quantile(avgArray, 0.05))
+                newRow[band] = avg
+                newRow[band + "_min"] = min
+                newRow[band + "_max"] = max
+
+            }
+            else {
+                //console.log ("fail")
+                newRow[band] = NaN
+            }
+        })
+        newRow.vector = getRootVectorMindLink(newRow) // Compute the averaged vector
+        newRows.push(newRow)
+    }
+    return newRows
 
 }

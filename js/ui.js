@@ -3,8 +3,16 @@
 function clickDiscord()
 {
     
+    openLink("https://discord.gg/FQEthg67")
+}
+function clickGithub()
+{
+    openLink("https://github.com/luobogao/meditationmaps")
+}
+function openLink(url)
+{
     window.open(
-        "https://discord.gg/FQEthg67",
+        url,
         '_blank' // <- This is what makes it open in a new window.
     );
 }

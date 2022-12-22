@@ -1,6 +1,96 @@
-var waypoints =
+var waypoints_mindlink = [
+    {
+        "id": "k_ml_1",
+        "user": "Kaio",
+        "label": "Anapana 1",
+        "vector": {
+            "delta": 6154,
+            "theta": 8035,
+            "alphaLow": 4025,
+            "alphaHigh": 3078,
+            "betaLow": 2711,
+            "betaHigh": 5337.5,
+            "gammaLow": 3456,
+            "gammaMid": 1673.5
+          }
+    },
+    {
+        "id": "k_ml_2",
+        "user": "Kaio",
+        "label": "Anapana 2",
+        "vector": {
+            "delta": 7515,
+            "theta": 9603.5,
+            "alphaLow": 3734,
+            "alphaHigh": 4162,
+            "betaLow": 3717.5,
+            "betaHigh": 8795,
+            "gammaLow": 7279,
+            "gammaMid": 2687.5
+          }
+    },
+    {
+        "id": "k_ml_3",
+        "user": "Kaio",
+        "label": "Anapana 3",
+        "vector": {
+            "delta": 4527.5,
+            "theta": 6933,
+            "alphaLow": 3391.5,
+            "alphaHigh": 3241,
+            "betaLow": 2404,
+            "betaHigh": 5431,
+            "gammaLow": 4292.5,
+            "gammaMid": 1684
+          }
+    },
+    {
+        "id": "k_ml_4",
+        "user": "Kaio",
+        "label": "Anapana 4",
+        "vector": {
+            "delta": 10968.5,
+            "theta": 10000,
+            "alphaLow": 5039,
+            "alphaHigh": 3983,
+            "betaLow": 4104,
+            "betaHigh": 7892,
+            "gammaLow": 5473.5,
+            "gammaMid": 2602
+          }
+    },
+]
+
+var waypoints_muse =
 
     [
+        {
+            "id": "similarities_nii_sleepy",
+            "user": "Nii",
+            "label": "Sleepiness",
+            "vector": {
+                "Delta_TP9": 2.2855,
+                "Theta_TP9": 2.4239,
+                "Alpha_TP9": 4.0585,
+                "Beta_TP9": 2.3156,
+                "Gamma_TP9": 0.5112,
+                "Delta_TP10": 2.0271,
+                "Theta_TP10": 2.2611,
+                "Alpha_TP10": 4.3803,
+                "Beta_TP10": 2.5506,
+                "Gamma_TP10": 0.6552,
+                "Delta_AF7": 0.8631,
+                "Theta_AF7": 0.6499,
+                "Alpha_AF7": 1.2579,
+                "Beta_AF7": 0.7707,
+                "Gamma_AF7": 0.3041,
+                "Delta_AF8": 0.7757,
+                "Theta_AF8": 0.6988,
+                "Alpha_AF8": 1.1929,
+                "Beta_AF8": 0.9591,
+                "Gamma_AF8": 0.3522
+              }
+        },
         {
             "id": "similarities_parks_mindfulness",
             "user": "Parks",

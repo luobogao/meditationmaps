@@ -1,6 +1,8 @@
 
+const minimumMatch = 0.4
 var backgroundColor = "#d9d9d9"
 var sidebarWidth = 300
+var waypoints = waypoints_muse
 
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
@@ -34,6 +36,7 @@ const fb_pairs = [["TP9", "AF7"], ["TP10", "AF8"]]
 var state =
 {
     "filename": "<filename>",
+    "device": "Muse",
     
     "model":
     {
@@ -49,9 +52,21 @@ function receivedFile() {
     // fr.result contains the string of the file that was uploading
 
     let string = fr.result
+    console.log("--> Loaded file")
 
     d3.select("#loader").style("display", "flex")
     d3.select("#browse-div").style("display", "none")
+
+    if (string.substring(0, 30).includes("timestampMs"))
+    {
+        state.device = "MindLink"
+        waypoints = waypoints_mindlink
+    }
+    else
+    {
+        state.device = "Muse"
+        waypoints = waypoints_muse
+    }
 
     let w = new Worker("js/worker_load.js")
     w.postMessage(string)
@@ -132,7 +147,7 @@ function rebuildChart() {
         var bestFullMatch = waypoints.filter(e => e.id ==  bestMatch[0])[0]
         console.log(bestFullMatch)
 
-        const minimumMatch = 0.8
+        
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -155,7 +170,6 @@ function rebuildChart() {
         else waypoint.match = false
     })
 
-
     // Combine the waypoints with the three user points
     if (selected_waypoints.length == 0) {
         alert("zero waypoints selected!")
@@ -168,7 +182,7 @@ function rebuildChart() {
 
 
         // Update user data if it exists
-        if (state.avg10.length > 10) {
+        if (state.lowRes.length > 10) {
             updateChartUser(state.lowRes)
             updateMiniChart(state.highRes)
 
@@ -187,7 +201,7 @@ function buildModel(vectors) {
     // Okay to use a mix of the "standard" vectors plus a few user vectors
     // Does not return x-y points - for that, need to call "run model" using the parameters set by this function
 
-
+    console.log("building model with " + vectors.length + " vectors")
     pca(vectors)
 
     // Build x-y points for each waypoint and store them
@@ -232,8 +246,9 @@ function setup() {
     // Build model of meditation states using the "vectors.js" file
     // This first time, include ALL the waypoints
     let vectors = waypoints.filter(e => e.exclude != true)
-    .filter(e => state.model.selected_users.includes(e.user))
-    .map(e => getRelativeVector(e.vector))
+      .filter(e => state.model.selected_users.includes(e.user))
+      .map(e => getRelativeVector(e.vector))
+    
     buildModel(vectors)
 
 
@@ -280,9 +295,16 @@ function setup() {
     d3.select("#message1")
         .style("position", "absolute")
         .style("bottom", "100px")
-        .style("opacity", 0.5)
-        .style("font-size", "10px")
+        .style("opacity", 0.7)
+        .style("font-size", "14px")
         .style("text-align", "center")
+
+    d3.select("#options")
+    .selectAll("*")
+    .on("mouseover", function(d)
+    {
+        d3.select(this).style("cursor", "pointer");
+    })
 
     buildSidebarRight()
 

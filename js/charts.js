@@ -14,7 +14,7 @@ var labels, links
 var linkSize = 1
 var labelSize = "10px"
 var labelColor = "black"
-var userSize = 20
+var userSize = 50
 var waypointSize = 20     // Size of waypoint circles
 var userOpacity = 0.3
 var userPointColor = "grey"
@@ -172,7 +172,7 @@ function updateChartWaypoints() {
 
     userSizeScale = d3.scaleLinear()
         .domain([-10, 10])
-        .range([15, 25])        
+        .range([userSize / 2, userSize])        
 
     fontScale = d3.scaleLinear()
         .domain([-10, 10])
@@ -495,7 +495,9 @@ function updateChartUser(data, type) {
             // Click on a user point
 
             console.log("vector at this point:")
+            //console.log(getRelativeVector(d.moment.vector))
             console.log(d.moment.vector)
+            
             // Toggle color for selected waypoint
             var selected = d3.select(this).attr("selected")
             if (selected) {

@@ -11,30 +11,37 @@
 
 <body>
 
-    <div id="mySidebar" class="sidebar">
-        <h2 style="text-align: center;">Meditation Maps</h2>
-        <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
-        <div id="browse-div" style="display: flex; justify-content: center;"></div>
-        <div id="loading-div"></div>
-        <div id="options" style="margin-top: 100px;"><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-            <a href="#">Tutorial</a>
-            <a  onclick="clickDiscord()">Discord Group</a></div>
-        
-        <p id="message1">Our goal is to collect meditation data from many experienced practitioners and make it freely available and useful to anyone interested in pursuing meditation</p>
-        
-      </div>
-      
-      <div id="main">
-        <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>              
-        <svg id="chartsvg"></svg>
-        
-            
-      </div>
-      <div id="sidebarRight" class="sidebarRight">
-        <svg id="minichart"></svg>
-      </div>
-      <div id="popup" style="display:none"></div>
-      
+  <div id="mySidebar" class="sidebar">
+    <h2 style="text-align: center;">Meditation Maps</h2>
+    <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
+    <div id="browse-div" style="display: flex; justify-content: center;"></div>
+    <div id="loading-div"></div>
+    <div id="options" style="margin-top: 100px;">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+      <a href="#">Tutorial</a>
+      <a onclick="clickDiscord()">Discord Group</a>
+      <a onclick="clickGithub()">Github</a>
+    </div>
+    <p id="message1">Our goal is to collect meditation data from many experienced practitioners and make it freely
+      available and useful to anyone interested in pursuing meditation</p>
+  
+    
+  </div>
+
+  
+  </div>
+
+  <div id="main">
+    <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>
+    <svg id="chartsvg"></svg>
+
+
+  </div>
+  <div id="sidebarRight" class="sidebarRight">
+    <svg id="minichart"></svg>
+  </div>
+  <div id="popup" style="display:none"></div>
+
 </body>
 <script src="js/charts.js"></script>
 <script src="js/minichart.js"></script>
@@ -43,4 +50,5 @@
 <script src="js/analysis.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/code.js"></script>
+
 </html>

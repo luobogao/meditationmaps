@@ -26,30 +26,34 @@ function cosineSimilarity(a, b)
 }
 
 
-const vector_columns = [
+const vector_columns_muse = [
     "Delta_TP9", "Theta_TP9", "Alpha_TP9", "Beta_TP9", "Gamma_TP9",
     "Delta_TP10", "Theta_TP10", "Alpha_TP10", "Beta_TP10", "Gamma_TP10",
     "Delta_AF7", "Theta_AF7", "Alpha_AF7", "Beta_AF7", "Gamma_AF7",
     "Delta_AF8", "Theta_AF8", "Alpha_AF8", "Beta_AF8", "Gamma_AF8"
 ]
+const vector_columns_mindlink = ["delta", "theta", "alphaLow", "alphaHigh", "betaLow", "betaHigh", "gammaLow", "gammaMid"]
 function getRootVector(row) {
 
     var data = {}
-    vector_columns.forEach(key => {
+    vector_columns_muse.forEach(key => {
         data[key] = row[key]
     })
 
     return data
 }
+function getRootVectorMindLink(row) {
+    var data = {}
+    vector_columns_mindlink.forEach(key => {
+        data[key] = row[key]
+    })
+    return data
+}
 
 function getRelativeVector(row) {
 
-    const channels = ["TP9", "TP10", "AF7", "AF8"]
-    const bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-
-    
     var vector
-    switch (standardizeType){
+    switch (standardizeType) {
         case "raw":
             vector = vectorRaw(row) // don't standardize at all - use raw values for each band+channel
             break;
@@ -58,6 +62,7 @@ function getRelativeVector(row) {
             break;
 
     }
+
     return vector
 
 }
@@ -70,30 +75,55 @@ function vectorRaw(row) {
             // Divide each value by the theta value in this channel
             // this is my method to avoid magnitude differences
             var key = band + "_" + channel
-            var value = ratio(row[key], row["Theta" + "_" + channel])
-
-            var raw_value = row[key]
-
             vector.push(row[key])
         })
     })
     return vector
 
 }
-function vectorRatio(row)
-{
+function vectorRatio(row) {
     var vector = []
-    var ratios = [["TP10", "TP9"], ["AF8", "AF7"], ["TP10", "AF8"], ["TP9", "AF7"]]
-    bands.forEach(band =>
-        {
-            ratios.forEach(ratio_keys =>
-                {
-                    var value = ratio(row[band + "_" + ratio_keys[0]], row[band + "_" + ratio_keys[1]])
-                    vector.push(value)
-                })
+
+    function ratioMuse() {
+
+        let bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+        var ratios = [["TP10", "TP9"], ["AF8", "AF7"], ["TP10", "AF8"], ["TP9", "AF7"]]
+        bands.forEach(band => {
+            ratios.forEach(ratio_keys => {
+                var value = ratio(row[band + "_" + ratio_keys[0]], row[band + "_" + ratio_keys[1]])
+
+                vector.push(value)
+            })
         })
 
-    return vector        
+
+
+    }
+
+    function ratioMindLink() {
+        var numerators = ["delta", "theta", "alphaLow", "alphaHigh", "betaLow", "betaHigh"]
+        var denoms = ["gammaLow", "gammaMid"]
+
+        numerators.forEach(numer => {
+            denoms.forEach(denom => {
+                var r = ratio(row[numer], row[denom])
+                vector.push(r)
+            })
+        })
+    }
+    
+    
+    switch (state.device) {
+        case "Muse":
+            ratioMuse();
+            break;
+        case "MindLink":
+            ratioMindLink()
+            break;
+    }
+
+    return vector
+
 
 }
 
@@ -176,14 +206,15 @@ function covarianceMeans(matrix) {
 
 function covarianceCosine(matrix) {
     var unit_scaled_matrix = unit_scaling(matrix)
-    
+
+
     //var unit_scaled_matrix = subtract_means(matrix)
     var cosineSimilarity_matrix = []
     for (var a = 0; a < matrix[0].length; a++) {
         var new_row = []
         for (var b = 0; b < matrix[0].length; b++) {
             var c = cosineV(a, b, unit_scaled_matrix)
-            
+
             new_row.push(c)
         }
         cosineSimilarity_matrix.push(new_row)
@@ -219,24 +250,23 @@ function pca(data)
     // Used by various models to make the covariance matrix
     means = [] // reset 
     maxes = [] // rest
-    
+
     for (var i = 0; i < matrix[0].length; i++) {
         let column = matrix.map(e => e[i])
         var max = d3.max(column.map(e => Math.abs(e)))
-        
+
         maxes.push(max)
         means.push(d3.mean(column))
 
     }
 
-
     var covariance_matrix = covarianceMatrix(matrix)
-    
+
     // Eigenvectors
     var e = math.eigs(covariance_matrix)
     var eigen_values = e.values
     var eigen_vectors = e.vectors
-    
+
 
     // View the eigen values - largest indicate best match
     var total_values = d3.sum(eigen_values)
@@ -268,7 +298,7 @@ function runModel(rows)
 
 {
     var d = prepareDataset(rows)
-    
+
     var mappedCoordinates = math.transpose(math.multiply(principals, d))
     return mappedCoordinates
 }

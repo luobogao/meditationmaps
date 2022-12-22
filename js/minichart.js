@@ -3,7 +3,18 @@ var y_mini;
 
 function updateMiniChart(museData) {
     
-    var data = museData.map(e => [e.seconds, e.Gamma_TP10])
+    var key
+    switch (state.device)
+    {
+        case "Muse":
+            key = "Gamma_TP10"
+            break;
+        case "MindLink":
+            key = "gammaMid"
+            break;
+    }
+    var data = museData.map(e => [e.seconds, e[key]])
+    
     var svg = d3.select("#minichartid")
     svg.selectAll("*").remove()
 
