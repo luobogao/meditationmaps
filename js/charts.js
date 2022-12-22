@@ -1,7 +1,7 @@
 var line = d3.line()
     // Basic line function - takes a list of points and plots them x-y, x-y one at a time
     .x(function (d, i) { return x(d[0]); })
-    .y(function (d, i) { return y(d[1])})
+    .y(function (d, i) { return y(d[1]) })
 //.curve(d3.curveMonotoneX) // apply smoothing to the line
 
 var waypointCircles = []
@@ -27,7 +27,7 @@ var waypointOpacity = 0.5
 var x;
 var y;
 var z;
-var opacityUser, opacityWaypoint, opacityText
+var opacityUser, opacityWaypoint, opacityText, fontScale
 var minx, maxx, miny, maxy, minz, maxz
 
 var cube;
@@ -76,8 +76,8 @@ function updateChartWaypoints() {
                 var x = e.sourceEvent.clientX
                 var y = e.sourceEvent.clientY
 
-                var xd =  (lastx - x)
-                var yd =  (lasty - y)
+                var xd = (lastx - x)
+                var yd = (lasty - y)
                 lastx = x
                 lasty = y
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
@@ -164,8 +164,14 @@ function updateChartWaypoints() {
         .range([chartHeight, 0])
 
     z = d3.scaleLinear()
-        .domain([minz, maxz])
+        .domain([-10, 10])
         .range([8, 15])
+
+    fontScale = d3.scaleLinear()
+        .domain([-10, 10])
+        .range([8, 12])
+
+
 
     opacityWaypoint = d3.scaleLinear()
         .domain([5, 10])
@@ -208,7 +214,7 @@ function updateChartWaypoints() {
         .style("font-size", function (d, i) {
 
             if (mode3d == true) {
-                return Math.floor(d.z) + "px"
+                return Math.floor(fontScale(d.z)) + "px"
             }
             else return labelSize
 
@@ -684,7 +690,7 @@ function readjustAllPoints(duration) {
             .style("font-size", function (d, i) {
 
                 if (mode3d == true) {
-                    return Math.floor(d.z) + "px"
+                    return Math.floor(fontScale(d.z)) + "px"
                 }
                 else return labelSize
             })
@@ -698,7 +704,7 @@ function readjustAllPoints(duration) {
     updatePoints("chart_user", "userpoints")
     updatePoints("chart_labels", "waypoints")
     updateLabels("chart_labels", "label")
-    
+
 
 }
 

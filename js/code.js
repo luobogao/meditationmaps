@@ -4,6 +4,7 @@ var sidebarWidth = 300
 
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
+var defaultSelectedUsers = ["Steffan", "Kaio", "Nii"]
 
 var chartMargin = 30
 
@@ -33,9 +34,11 @@ const fb_pairs = [["TP9", "AF7"], ["TP10", "AF8"]]
 var state =
 {
     "filename": "<filename>",
+    
     "model":
     {
         "mapped": null, // Mapped x-y coordinates of each standard vector
+        "selected_users": defaultSelectedUsers,
     },
     "avg10": []
 
@@ -224,12 +227,22 @@ function setup() {
 
     // Build model of meditation states using the "vectors.js" file
     // This first time, include ALL the waypoints
-    let vectors = waypoints.filter(e => e.exclude != true).map(e => getRelativeVector(e.vector))
+    let vectors = waypoints.filter(e => e.exclude != true)
+    .filter(e => state.model.selected_users.includes(e.user))
+    .map(e => getRelativeVector(e.vector))
     buildModel(vectors)
 
 
     // Immediately display a map of the waypoints when user loads page
-    waypoints.map(e => e.match = true) // For this splash chart, use all waypoints
+    waypoints.forEach(e => 
+        {
+            if (state.model.selected_users.includes(e.user))
+            {
+                e.match = true
+            }
+            
+        }
+        ) 
     updateChartWaypoints()
 
     buildLoading(d3.select("#loading-div"))
@@ -272,8 +285,8 @@ function setup() {
 }
 function buildSidebarRight() {
     // Right sidebar
-    var contributors = unique(waypoints.map(e => e.user))
-    state.model.selected_users = contributors
+    var contributors =  unique(waypoints.map(e => e.user))
+    
 
     var div = d3.select("#sidebarRight")
         .append("div")
@@ -282,11 +295,19 @@ function buildSidebarRight() {
 
     function addCheckbox(name) {
         var checkboxDiv = div.append("div")
+            .style("font-size", "30px")
             .style("margin", "8px")
+
+        var checked = false            
+        if (state.model.selected_users.includes(name)) checked = true 
 
         checkboxDiv.append("input")
             .attr("type", "checkbox")
-            .property("checked", true)
+            .style("width", "20px")
+            .style("height", "20px")
+            .style("accent-color", "lightgreen")
+            .style("opacity", 0.7)
+            .property("checked", checked)
             .on("click", function () {
                 const newState = this.checked
 
@@ -302,7 +323,7 @@ function buildSidebarRight() {
                     }
 
                 }
-                console.log(state.model.selected_users)
+                
                 rebuildChart()
 
             })
