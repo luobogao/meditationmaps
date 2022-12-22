@@ -147,7 +147,7 @@ function processMuseData(rows) {
     console.log("Standardized rows")
 
     var lowResolution = 60   // average over 60 seconds
-    var highResolution = 20  // average over 10 seconds
+    var highResolution = 10  // average over 10 seconds
 
     // Long duration meditations should using longer rounding
     if (total_hours > 0.8) {
@@ -159,6 +159,7 @@ function processMuseData(rows) {
     let averageLowRes = averageRows(clone(standardRows), lowResolution)
     let average10 = averageRows(clone(standardRows), standardRows.length / 10)
     let averageMax = averageRows(clone(standardRows), standardRows.length / 100)
+    
 
     if (averageLowRes.length < 3) {
         alert("Meditation session was too short: " + averageLowRes.length + " minutes")
@@ -191,7 +192,7 @@ function averageRows(rows, roundN) {
     
     console.log("Rounding with " + roundN + " in " + rows.length + " rows")
     roundN = Math.round(roundN)
-    if (roundN == 1) {
+    if (roundN <= 1) {
         console.log("ERROR: rounding is too low, using raw rows")
         return rows
     }

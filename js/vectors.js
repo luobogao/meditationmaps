@@ -349,7 +349,7 @@ var waypoints =
         {
             "id": "similarity_nii_biaural",
             "user": "Nii",
-            "label": "Binaural Beats",
+            "label": "Not Meditating",
             "vector": {
                 "Delta_TP9": 1.8505,
                 "Theta_TP9": 4.2806,

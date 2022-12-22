@@ -25,7 +25,7 @@ var waypointColor = "blue"
 
 // 2D mode
 var waypointR = 8     // Size of waypoint circles
-var waypointOpacity = 1
+var waypointOpacity = 0.5
 
 var x;
 var y;
@@ -172,7 +172,7 @@ function updateChartWaypoints() {
 
     opacityWaypoint = d3.scaleLinear()
         .domain([5, 10])
-        .range([0.4, 1])
+        .range([0.4, waypointOpacity])
 
     opacityUser = d3.scaleLinear()
         .domain([5, 10])
@@ -207,7 +207,7 @@ function updateChartWaypoints() {
         .attr("class", "label")
         .style("fill", labelColor)
         .attr("x", function (d, i) { return d.x + d.z })
-        .attr("y", function (d) { return d.y + d.z})
+        .attr("y", function (d) { return d.y + d.z })
         .style("font-size", function (d, i) {
 
             if (mode3d == true) {
@@ -261,8 +261,8 @@ function updateChartWaypoints() {
 
         .attr("r", function (d) {
             if (mode3d == true) {
-                //    return z(d.z)
-                return waypointR
+                return z(d.z)
+
             }
             else {
                 return waypointR
@@ -408,11 +408,16 @@ function updateChartUser(data, type) {
         var zi = entry[2]
         index++
 
-        lineData.push([xi, yi])
+        lineData.push([x(xi), y(yi)])
         userCircles.push({ x: xi, y: yi, z: zi, moment: moment })
 
     })
     cameraProject(userCircles)
+
+    svg.append("path")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("d", line(lineData))
 
 
     // USER'S POINTS
@@ -451,7 +456,7 @@ function updateChartUser(data, type) {
 
                     var marker_y = y_mini(match.Gamma_TP10)
                     var marker_x = x_mini(match.seconds)
-                    
+
                     d3.select("#mini-marker")
                         .attr("cx", marker_x)
                         .attr("cy", marker_y)
@@ -517,7 +522,9 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
     var Azz = cosb * cosc;
 
     // TODO: use matrix math library
-    //var m = math.matrix([[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]])
+    var transform = [[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]]
+    var m = matrix.map(row => [row.x, row.y, row.z])
+    console.log(math.multiply(m, transform))
 
 
     for (var i = 0; i < matrix.length; i++) {
@@ -599,21 +606,20 @@ function recenter(center) {
         })
 
     })
-    
+
     readjustAllPoints(1000)
 
 }
 function readjustAllPoints(duration) {
     cameraProject(waypointCircles)
-    if (userCircles.length > 0)
-    {
+    if (userCircles.length > 0) {
         cameraProject(userCircles)
     }
-    
+
     function updatePoints(svgid, classname) {
         var svg = d3.select("#" + svgid)
         svg.selectAll("." + classname)
-        .transition()
+            .transition()
             .attr("cx", function (d) {
                 return x(d.xp)
             })
@@ -627,10 +633,10 @@ function readjustAllPoints(duration) {
                     return size
                 }
                 else {
-                    //    var size = z(d.z)
-                    // if (size < 5) size = 5
-                    //return size
-                    return waypointR
+                    var size = z(d.z)
+                    if (size < 5) size = 5
+                    return size
+
                 }
 
 
@@ -659,7 +665,7 @@ function readjustAllPoints(duration) {
     function updateLabels(svgid, classname) {
         var svg = d3.select("#" + svgid)
         svg.selectAll("." + classname)
-        .transition()
+            .transition()
             .attr("x", function (d) {
                 return d.x + d.z
             })

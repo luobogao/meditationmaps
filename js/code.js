@@ -122,7 +122,7 @@ function rebuildChart() {
         })
         console.log("sorted matches:")
         console.log(maxd)
-        const minimumMatch = 0.8 // filter out waypoints with a cosine similarity less than this 
+        const minimumMatch = 0.8
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -159,7 +159,7 @@ function rebuildChart() {
 
         // Update user data if it exists
         if (state.avg10.length > 10) {
-            updateChartUser(state.lowRes)
+            updateChartUser(state.avg10)
             updateMiniChart(state.highRes)
 
         }
