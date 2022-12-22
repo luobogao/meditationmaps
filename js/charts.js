@@ -14,20 +14,21 @@ var labels, links
 var linkSize = 1
 var labelSize = "10px"
 var labelColor = "black"
-var userSize = 15
+var userSize = 20
+var waypointSize = 20     // Size of waypoint circles
 var userOpacity = 0.3
 var userPointColor = "grey"
 var waypointColor = "blue"
 
 
 // 2D mode
-var waypointR = 8     // Size of waypoint circles
+
 var waypointOpacity = 0.5
 
 var x;
 var y;
 var z;
-var opacityUser, opacityWaypoint, opacityText, fontScale
+var opacityUser, opacityWaypoint, opacityText, fontScale, userSizeScale
 var minx, maxx, miny, maxy, minz, maxz
 
 var cube;
@@ -139,26 +140,21 @@ function updateChartWaypoints() {
 
     ]
 
-    minx = minx * 2
-    maxx = maxx * 2
-    miny = miny * 2
-    maxy = maxy * 2
+    minx = minx * 1.3
+    maxx = maxx * 1.3
+    miny = miny * 1.3
+    maxy = maxy * 1.3
 
 
 
     // Make the min/max square
     
-    // if (Math.abs(minx) < maxx) minx = -1 * maxx
-    // else maxx = -1 * minx
-    // if (Math.abs(miny) < maxy) miny = -1 * maxy
-    // else maxy = -1 * miny
+    if (Math.abs(minx) < maxx) minx = -1 * maxx
+    else maxx = -1 * minx
+    if (Math.abs(miny) < maxy) miny = -1 * maxy
+    else maxy = -1 * miny
 
-    minx = -10
-    maxx = 10
-    miny = -10
-    maxy = 10
-    console.log("ACTUAL WIDTH:" + chartHeight)
-
+    
     // These D3 functions return the properly scaled x and y coordinates
     x = d3.scaleLinear()
         .domain([minx, maxx]) // input
@@ -173,6 +169,10 @@ function updateChartWaypoints() {
     z = d3.scaleLinear()
         .domain([-10, 10])
         .range([8, 15])
+
+    userSizeScale = d3.scaleLinear()
+        .domain([-10, 10])
+        .range([15, 25])        
 
     fontScale = d3.scaleLinear()
         .domain([-10, 10])
@@ -203,7 +203,7 @@ function updateChartWaypoints() {
         if (entry.match == true) {
             waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry })
             label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
-            anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointR })
+            anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointSize })
         }
 
     })
@@ -279,7 +279,7 @@ function updateChartWaypoints() {
 
             }
             else {
-                return waypointR
+                return waypointSize
             }
 
 
@@ -330,8 +330,10 @@ function updateChartWaypoints() {
         }
         )
         .on("mouseover", function (event, d) {
+            
             if (zooming == false) {
                 var note = d.fullentry.popup
+                d3.select(this).style("fill", "red")
 
                 const user = d.fullentry.user
                 if (note == undefined) { note = "(No Notes)" }
@@ -353,6 +355,7 @@ function updateChartWaypoints() {
 
         })
         .on("mouseout", function (event, d) {
+            d3.select(this).style("fill", waypointColor)
             d3.select("#popup")
                 .transition()
                 .style("display", "none")
@@ -448,7 +451,7 @@ function updateChartUser(data, type) {
             return x(d.x)
         })
         .attr("cy", function (d) { return y(d.y) })
-        .attr("r", function (d) { return z(d.z) })
+        .attr("r", function (d) { return userSizeScale(d.z)})
         .attr("seconds", function (d) {
             return d.moment.seconds
         })
@@ -459,7 +462,7 @@ function updateChartUser(data, type) {
         .on("mouseover", function (i, d) {
 
             if (zooming != true) {
-                d3.select(this).style("opacity", 1).style("stroke", "black")
+                d3.select(this).style("opacity", 1) //.style("stroke", "black")
 
                 // Move the mini-chart marker to the same point
 
@@ -506,7 +509,7 @@ function updateChartUser(data, type) {
 
         })
         .on("mouseout", function (d) {
-            d3.select(this).style("opacity", userOpacity).style("stroke", "none")
+            d3.select(this).style("opacity", userOpacity) //.style("stroke", "none")
             d3.select("#mini-marker").style("display", "none")
         })
 
@@ -640,7 +643,7 @@ function readjustAllPoints(duration) {
             })
             .attr("r", function (d) {
                 if (classname == "userpoints") {
-                    var size = z(d.z)
+                    var size = userSizeScale(d.z)
                     if (size < 5) size = 5
                     return size
                 }

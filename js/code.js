@@ -96,7 +96,7 @@ function rebuildChart() {
 
         }
 
-        var userVectors = state.highRes.map(e => getRelativeVector(e.vector))
+        var userVectors = state.avg10.map(e => getRelativeVector(e.vector))
 
 
         // Filter the waypoints by minimum distance from any of these test user vectors
@@ -126,8 +126,9 @@ function rebuildChart() {
         maxd.sort(function (a, b) {
             return a[1] - b[1]
         })
-        console.log("sorted matches:")
-        console.log(maxd)
+        console.log("Best Match:")
+        console.log(maxd[maxd.length - 1])
+
         const minimumMatch = 0.8
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
