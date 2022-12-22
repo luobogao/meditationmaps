@@ -46,11 +46,14 @@ function receivedFile() {
     // fr.result contains the string of the file that was uploading
 
     let string = fr.result
-    
+
+    d3.select("#loader").style("display", "flex")
+    d3.select("#browse-div").style("display", "none")
+
     let w = new Worker("js/worker_load.js")
     w.postMessage(string)
-    w.onmessage = function(event) {
-        
+    w.onmessage = function (event) {
+
         var data = JSON.parse(event.data)
         state.raw = data.raw
         state.lowRes = data.lowRes
@@ -71,8 +74,9 @@ function receivedFile() {
 function rebuildChart() {
     // Critical variables
 
-    
-    
+    d3.select("#loader").style("display", "none")
+    d3.select("#browse-div").style("display", "flex")
+
 
     var waypoints_include = waypoints //.filter(e => e.exclude != true) // remove manually excluded vectors
     var filtered_waypoints_match = waypoints_include
@@ -83,11 +87,10 @@ function rebuildChart() {
         // Including user data like this helps to orient the chart 
 
         var variances = band_channels.map(key => d3.variance(state.avg10.map(e => e[key])))
-        if (!variances.every(e => e != 0))
-        {
+        if (!variances.every(e => e != 0)) {
             alert("Bad data! Electrodes not attached right")
             return
-            
+
         }
 
         var userVectors = state.highRes.map(e => getRelativeVector(e.vector))
@@ -101,7 +104,7 @@ function rebuildChart() {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = cosineSimilarity(uservector, waypoint_vector)
-                
+
                 if (id in distanceIds) {
                     // This is the best match so far
                     if (distanceIds[id] < distance) {
@@ -132,7 +135,7 @@ function rebuildChart() {
     // Remove waypoints that have been de-selected by the user
     var filtered_waypoints_user = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
     var selected_waypoints = filtered_waypoints_user.map(e => getRelativeVector(e.vector))
-    
+
     console.log("Using " + selected_waypoints.length + " waypoints")
 
     var ids = filtered_waypoints_user.map(e => e.id)
@@ -153,13 +156,13 @@ function rebuildChart() {
     else {
         console.log("building model with " + selected_waypoints.length + " waypoints")
         buildModel(selected_waypoints)
-        
+
         updateChartWaypoints()
 
 
         // Update user data if it exists
         if (state.avg10.length > 10) {
-            updateChartUser(state.avg10)
+            updateChartUser(state.lowRes)
             updateMiniChart(state.highRes)
 
         }
@@ -229,7 +232,7 @@ function setup() {
     waypoints.map(e => e.match = true) // For this splash chart, use all waypoints
     updateChartWaypoints()
 
-
+    buildLoading(d3.select("#loading-div"))
 
     // Mini-graph
     d3.select("#minichart")
@@ -256,6 +259,13 @@ function setup() {
         .style("z-index", 10)
         .style("color", "white")
         .style("margin-right", "20px")
+
+    d3.select("#message1")
+        .style("position", "absolute")
+        .style("bottom", "100px")
+        .style("opacity", 0.5)
+        .style("font-size", "10px")
+        .style("text-align", "center")
 
     buildSidebarRight()
 
@@ -305,7 +315,7 @@ function buildSidebarRight() {
         addCheckbox(name)
     })
     var cameraMatrix = [[5, 0, 0, 0], [0, 5, 0, 0], [0, 0, 1, 0]]
-    
+
 
 
 }

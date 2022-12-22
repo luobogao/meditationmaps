@@ -86,3 +86,48 @@ function buildBrowseFile (div, label, id)
         .text (label)
 
 }
+function buildLoading (div)
+{
+    div.style("display", "flex").style("justify-content", "center")
+    var width = 100,
+        height = 100,
+        n = 18,
+        r = 5,
+        π = Math.PI,
+        p = 1000;
+    var container = div.append ("div")
+        .attr ("id", "loader")
+        .style ("position", "absolute")
+        .style("justify-content", "center")
+        .style ("margin-top", "10px")
+        .style("display", "none")    
+
+    var svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height)
+
+    var g = svg.selectAll("g")
+        .data(d3.range(0, 2 * π, 2 * π / n))
+        .enter().append("g")
+        .attr("transform", function(d) {
+            var x = width  * (0.35 * Math.cos(d) + 0.5),
+                y = height * (0.35 * Math.sin(d) + 0.5);
+            return "translate(" + [x, y] + ")rotate(" + d * 180 / π + ")";
+        });
+    var moons = g.append("path")
+        .attr("fill", "white");
+
+    d3.timer(function(t) {
+        var θ = 2 * π * (t % p / p);
+        moons.attr("d", function(d) { return moon((θ + d) % (2 * π)); });
+    });
+    function moon(θ) {
+        var rx0 = θ < π ? r : -r,
+            s0  = θ < π ? 0 : 1,
+            rx1 = r * Math.cos(θ),
+            s1  = θ < π/2 || (π <= θ && θ < 3*π/2) ? 0 : 1;
+        return "M" + [                  0,  r] +
+            "A" + [rx0, r, 0, 0, s0, 0, -r] +
+            "A" + [rx1, r, 0, 0, s1, 0,  r];
+    }
+}

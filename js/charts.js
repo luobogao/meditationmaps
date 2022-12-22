@@ -1,10 +1,7 @@
 var line = d3.line()
     // Basic line function - takes a list of points and plots them x-y, x-y one at a time
-    .x(function (d, i) { return d[0]; })
-    .y(function (d, i) {
-        return d[1]
-
-    })
+    .x(function (d, i) { return x(d[0]); })
+    .y(function (d, i) { return y(d[1])})
 //.curve(d3.curveMonotoneX) // apply smoothing to the line
 
 var waypointCircles = []
@@ -79,8 +76,8 @@ function updateChartWaypoints() {
                 var x = e.sourceEvent.clientX
                 var y = e.sourceEvent.clientY
 
-                var xd = -1 * (lastx - x)
-                var yd = -1 * (lasty - y)
+                var xd =  (lastx - x)
+                var yd =  (lasty - y)
                 lastx = x
                 lasty = y
                 if (Math.abs(xd) < 20 && Math.abs(yd) < 20) {
@@ -257,6 +254,8 @@ function updateChartWaypoints() {
         })
         .attr("cy", function (d) {
             return y(d.yp)
+
+
         })
 
         .attr("r", function (d) {
@@ -408,16 +407,18 @@ function updateChartUser(data, type) {
         var zi = entry[2]
         index++
 
-        lineData.push([x(xi), y(yi)])
+        lineData.push([xi, yi, zi])
         userCircles.push({ x: xi, y: yi, z: zi, moment: moment })
 
     })
     cameraProject(userCircles)
 
-    svg.append("path")
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("d", line(lineData))
+    // svg.append("path")
+    //     .attr("fill", "none")
+    //     .attr("stroke", "black")
+    //     .attr("stroke-width", "10px")
+    //     .attr("opacity", 0.3)
+    //     .attr("d", line(lineData))
 
 
     // USER'S POINTS
@@ -522,37 +523,33 @@ function rotate(pitch, yaw, roll, matrix, classname, type, svgid) {
     var Azz = cosb * cosc;
 
     // TODO: use matrix math library
+
     var transform = [[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]]
-    var m = matrix.map(row => [row.x, row.y, row.z])
-    console.log(math.multiply(m, transform))
+    if (type == "list") {
 
-
-    for (var i = 0; i < matrix.length; i++) {
-        var px, py, pz
-
-
-        if (type == "list" || type == "cube") {
-
-            px = matrix[i].x
-            py = matrix[i].y
-            pz = matrix[i].z
-            matrix[i].x = Axx * px + Axy * py + Axz * pz
-            matrix[i].y = Ayx * px + Ayy * py + Ayz * pz
-            matrix[i].z = Azx * px + Azy * py + Azz * pz
-
+        var m = matrix.map(row => [row.x, row.y, row.z])
+        var m2 = math.multiply(m, transform)
+        for (let e = 0; e < m2.length; e++) {
+            matrix[e].x = m2[e][0]
+            matrix[e].y = m2[e][1]
+            matrix[e].z = m2[e][2]
         }
-        else {
 
-            // Labels
-            px = x.invert(matrix[i].x)
-            py = y.invert(matrix[i].y)
-            pz = z.invert(matrix[i].z)
-            matrix[i].x = x(Axx * px + Axy * py + Axz * pz)
-            matrix[i].y = y(Ayx * px + Ayy * py + Ayz * pz)
-            matrix[i].z = z(Azx * px + Azy * py + Azz * pz)
 
-        }
     }
+    else {
+
+        var m = matrix.map(row => [x.invert(row.x), y.invert(row.y), z.invert(row.z)])
+        var m2 = math.multiply(m, transform)
+        for (let e = 0; e < m2.length; e++) {
+            matrix[e].x = x(m2[e][0])
+            matrix[e].y = y(m2[e][1])
+            matrix[e].z = z(m2[e][2])
+        }
+
+
+    }
+
 
     // Camera projection
     if (classname == "waypoints" || classname == "userpoints") {
@@ -648,12 +645,12 @@ function readjustAllPoints(duration) {
                     //var opacity = opacityUser(z(d.z))
                     //if (opacity < 0.1) opacity = 0.1
                     //return opacity
-                    return userOpacity
+                    return userOpacity //userOpacity
                 }
                 else {
-                    var opacity = opacityWaypoint(z(d.z))
-                    if (opacity < 0.1) opacity = 0.1
-                    return opacity
+                    //var opacity = opacityWaypoint(z(d.z))
+                    //if (opacity < 0.1) opacity = 0.1
+                    return waypointOpacity
                 }
 
             })
@@ -701,6 +698,7 @@ function readjustAllPoints(duration) {
     updatePoints("chart_user", "userpoints")
     updatePoints("chart_labels", "waypoints")
     updateLabels("chart_labels", "label")
+    
 
 }
 
