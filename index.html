@@ -17,33 +17,46 @@
     <div id="browse-div" style="display: flex; justify-content: center;"></div>
     <div id="loading-div"></div>
     <div id="options" style="margin-top: 100px;">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+      <div>
+
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+      </div>
       <a href="#">Tutorial</a>
-      <a onclick="clickDiscord()">Discord Group</a>
-      <a onclick="clickGithub()">Github</a>
+      <div class="logos">
+        <img style="height:20px" src="assets/discord.png"></img>
+        <a onclick="clickDiscord()">Discord</a>
+      </div>
+      <div class="logos">
+        <img style="height:25px" src="assets/github.png"></img>
+        <a onclick="clickGithub()">Github</a>
+      </div>
+
+      
     </div>
     <p id="message1">Our goal is to collect meditation data from many experienced practitioners and make it freely
       available and useful to anyone interested in pursuing meditation</p>
-  
-    
+
+
   </div>
 
-  
+
   </div>
 
   <div id="main">
     <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>
     <svg id="chartsvg"></svg>
-
+    
 
   </div>
   <div id="sidebarRight" class="sidebarRight">
+    <svg id="matchchart"></svg>
     <svg id="minichart"></svg>
   </div>
   <div id="popup" style="display:none"></div>
 
 </body>
 <script src="js/charts.js"></script>
+<script src="js/cardchart.js"></script>
 <script src="js/minichart.js"></script>
 <script src="js/vectors.js"></script>
 <script src="js/utils.js"></script>

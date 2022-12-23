@@ -16,7 +16,7 @@ var labelSize = "10px"
 var labelColor = "black"
 var userSize = 50
 var waypointSize = 20     // Size of waypoint circles
-var userOpacity = 0.3
+var userOpacity = 0.2
 var userPointColor = "grey"
 var waypointColor = "blue"
 
@@ -337,30 +337,15 @@ function updateChartWaypoints() {
 
                 const user = d.fullentry.user
                 if (note == undefined) { note = "(No Notes)" }
-                var fullhtml = "<h2>" + user + "</h2>" + note + "<br><br>" + d.fullentry.cosineSimiarity
-                var x = event.pageX
-                var y = event.pageY
-                var popup = d3.select("#popup")
-
-                popup
-                    .style("display", "flex")
-                    //.style("width", "200px")
-                    //.style("height", "100px")
-                    .style("left", (x + 10) + "px")
-                    .style("top", (y + 10) + "px")
-                    .append("div").style("margin", "10px")
-                    .html(fullhtml)
+                var html = "<h2>" + user + "</h2>" + note + "<br><br>" + d.fullentry.cosineSimiarity
+                popUp(event, html)
             }
 
 
         })
         .on("mouseout", function (event, d) {
             d3.select(this).style("fill", waypointColor)
-            d3.select("#popup")
-                .transition()
-                .style("display", "none")
-                .duration(100)
-                .selectAll("*").remove()
+            popUpremove()
 
         })
 
@@ -455,6 +440,7 @@ function updateChartUser(data, type) {
         .attr("seconds", function (d) {
             return d.moment.seconds
         })
+        .style("mix-blend-mode", "multiply") // How the opacity behaves with overlaps
 
 
         .attr("opacity", userOpacity)

@@ -439,7 +439,7 @@ var waypoints_muse =
         {
             "id": "similarity_nii_biaural",
             "user": "Nii",
-            "label": "Not Meditating",
+            "label": "Focus",
             "vector": {
                 "Delta_TP9": 1.8505,
                 "Theta_TP9": 4.2806,

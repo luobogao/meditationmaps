@@ -208,10 +208,12 @@ function averageRows(rows, roundN) {
     else {
         const roundN_half = Math.round(roundN / 2)
         let newRows = []
-        for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN_half) {
+        var firstSeconds = rows[0].seconds
+        for (let i = roundN_half + 1; i < rows.length - roundN_half; i = i + roundN) {
             if (i < rows.length) {
                 let row = rows[i]
                 let newRow = {}
+                newRow.firstSeconds = firstSeconds
                 newRow.seconds = row.seconds
                 newRow.minutes = row.minutes
 
@@ -321,11 +323,13 @@ function averageRowsMindLink(rows, roundN) {
     let newRows = []
 
     if (roundN2 < 1) { roundN2 = 1; roundN = 2 }
+    var firstSeconds = rows[0].seconds
 
-    for (let i = roundN2 + 1; i < rows.length - roundN2 - 5; i = i + roundN2) {
+    for (let i = roundN2 + 1; i < rows.length - roundN2 - 5; i = i + roundN) {
         let newRow = {}
         let seconds = rows[i].seconds
         let minutes = rows[i].minutes
+        newRow.firstSeconds = firstSeconds  // Used by charts to measure the visual offset
         newRow.seconds = seconds
         newRow.minutes = minutes
         newRow.tag = rows[i].tag
