@@ -22,6 +22,7 @@ self.addEventListener("message", function (e) {
     let data = d3.csvParse(filestring)
     let headers = data.slice(-1)[0]
     let rows = data.slice(0, data.length - 1)
+    console.log("--> Loaded " + rows.length + " rows")
     let keys = Object.keys(rows[0])
     if (keys.includes("timestampMs")) {
         processDataMindLink(rows, "data1")
@@ -315,6 +316,7 @@ function processDataMindLink(rows) {
 }
 function averageRowsMindLink(rows, roundN) {
 
+    console.log(rows)
     let roundN2 = Math.round(roundN / 2)
     if (roundN2 <= 1)
     {

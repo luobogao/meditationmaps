@@ -1,3 +1,5 @@
+// Note: when adding new category, need to setup with UIDs
+
 var waypoints_mindlink = [
     {
         "id": "k_ml_1",

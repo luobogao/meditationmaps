@@ -27,7 +27,7 @@ function buildCardChart(rows) {
             var add = true
             if (cardCollection.length > 0) {
                 var lastCards = cardCollection.slice(-1)[0]
-                if (arraysEqual(lastCards.cards, labels)) {
+                if (arraysEqual(lastCards.cards.map(e => e.label), labels)) {
 
                     add = false
                 }
@@ -48,9 +48,11 @@ function buildCardChart(rows) {
         }
         i++
     })
+    var collection_i = 0
     cardCollection.forEach(entry => {
         var cards = entry.cards
 
+        
         var xi = x(entry.i)
         var firstY = y(cards[0].distance)
         var cardHeight = 50
@@ -59,9 +61,42 @@ function buildCardChart(rows) {
 
         cards.forEach(card => {
 
-            var thisY = d3.max([y(card.distance), lastY])
+            var last_y = 0
+            var last_x = 0
+            var thisY = d3.max([y(card.distance), lastY]) // Move card down if it overlaps
+
+            // Find the y value of the card from the previous column, to make a smooth line to it
+            if (collection_i > 0)
+            {
+                
+                var last_collection = cardCollection[collection_i - 1]
+                last_x = x(last_collection.i)
+                // Identify the right card using UID
+                var last_card_match = last_collection.cards.filter(e => e.waypoint.uid == card.waypoint.uid)
+                if (last_card_match.length == 1)
+                {
+                    var last_card = last_card_match[0]
+                    
+                    last_y = d3.select("#" + last_card.uid).attr("y")
+                    
+                }
+                else{
+                    last_y = 1000
+                }
+            }
+            if (last_y > 0)
+            {
+                svg.append("line")
+                .attr("x1", last_x + cardWidth)
+                .attr("y1", last_y + 10)
+                .attr("x2", xi)
+                .attr("y2", thisY)
+                .style("stroke", "black")
+            }
+            
             svg.append("rect")
                 .attr("x", xi)
+                .attr("id", card.uid)
                 .attr("y", thisY)
                 .attr("width", cardWidth)
                 .attr("height", cardHeight)
@@ -71,21 +106,21 @@ function buildCardChart(rows) {
 
             svg.append("text")
                 .text(card.waypoint.label)
-                .style("font-size", "14px")
-                .attr("x", xi + 10)
-                .attr("y", thisY + cardHeight / 2)
+                .style("font-size", "13px")
+                .attr("x", xi + 3)
+                .attr("y", thisY + 15)
 
             svg.append("text")
                 .text(card.waypoint.user)
-                .style("font-size", "12px")
-                .attr("x", xi + 20)
-                .attr("opacity", 0.7)
-                .attr("y", thisY + (cardHeight / 2) + 10)
+                .style("font-size", "11px")
+                .attr("x", xi + 10)
+                .attr("opacity", 0.8)
+                .attr("y", thisY + 15 + 10)
 
 
             lastY = thisY + cardHeight + cardYmargin
         })
-
+        collection_i ++
 
 
     })

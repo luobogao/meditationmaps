@@ -84,7 +84,7 @@ function clone(obj)
 {
     return JSON.parse(JSON.stringify(obj))
 }
-var getRandomStr = function(){
+var uid = function(){
     var randomStrLength = Math.floor(Math.random() * 10) + 5,
     pool = 'abcdefghijklmnopqrstuvwxyz1234567890',
     randomStr = '';
@@ -95,5 +95,5 @@ var getRandomStr = function(){
          randomStr += randomChar;     
     }
     
-    return randomStr;
+    return "uid_" + randomStr;
 }

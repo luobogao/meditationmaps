@@ -181,7 +181,7 @@ function rebuildChart() {
             var distance = cosineSimilarity(userVector, waypointVector)
             var label = waypoint.label + " (" + waypoint.user + ")"
 
-            distances.push({ label: label, distance: distance, waypoint: waypoint })
+            distances.push({ label: label, distance: distance, waypoint: waypoint, uid: uid() })
 
         })
         distances.sort(function (a, b) {
@@ -199,7 +199,7 @@ function rebuildChart() {
 
     // Charts
 
-    var type = "cards"
+    var type = "map"
     if (type == "map") {
         updateChartWaypoints()
 
@@ -291,6 +291,12 @@ function setup() {
 
     }
     )
+
+    // Add UIDs for every waypoint
+    waypoints_muse.forEach(e => e.uid = uid())
+    waypoints_mindlink.forEach(e => e.uid = uid())
+
+
     updateChartWaypoints()
 
     buildLoading(d3.select("#loading-div"))
