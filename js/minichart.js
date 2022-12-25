@@ -44,12 +44,33 @@ function buildBandChart(userData) {
 
 }
 function buildSimilarityChart(userData) {
-    var waypointN = userData[0].distances.length
+    var waypoint_labels = []
+    userData.map(e => {
+        e.distances.map(d =>
+            {
+                waypoint_labels.push(d.label)
+            })
+    })
+    waypoint_labels = unique(waypoint_labels)
     var data = []
-    for (let i = 0; i < waypointN; i++) {
+    
+    for (let i = 0; i < waypoint_labels.length; i++) {
 
-        var arr = userData.map(row => [row.seconds, row.distances[i].distance])
-        var newdata = { data: arr, label: userData[0].distances[i].label }
+        var name = waypoint_labels[i]
+        var arr = []
+        userData.map(row => 
+            {
+                var x = row.seconds
+                var matches = row.distances.filter(e => e.label == name)
+
+                if (matches.length == 1)
+                {
+                    arr.push([x, matches[0].distance])
+                }
+                
+            })
+        
+        var newdata = { data: arr, label: name}
         data.push(newdata)
 
     }
@@ -58,16 +79,16 @@ function buildSimilarityChart(userData) {
         data: data,
         firstX: userData[0].firstSeconds,
         svgId: "matchchartid",
-        chartType: "log",
+        chartType: "linear",
         yAxis:
         {
-            yMin: 50,
+            yMin: 10,
             yMax: 100,
         },
 
         interactionType: "highlight",
-        lineWidth: 1,
-        resolution: 10,
+        lineWidth: 3,
+        resolution: 50,
         size:
         {
             width: matchchartWidth,
@@ -146,9 +167,14 @@ function updateMiniChart(settings) {
 
         var line = d3.line()
             // Basic line function - takes a list of points and plots them x-y, x-y one at a time
-            .x(function (d, i) { return x_mini(d[0]); })
-            .y(function (d, i) {
+            .x(function (d, i) { 
+                return x_mini(d[0]); 
+                
+            })
+            .y(function (d, i) 
+            {
                 return y_mini(d[1])
+                
             })
             .curve(d3.curveMonotoneX) // apply smoothing to the line
 

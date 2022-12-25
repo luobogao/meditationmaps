@@ -1,3 +1,4 @@
+debug = false
 function centroid(matrix)
 {
     
@@ -14,6 +15,7 @@ function unique(arr)
     }
     return arr.filter(onlyUnique)
 }
+
 
 
 function ratio(x, y)
@@ -84,7 +86,7 @@ function clone(obj)
 {
     return JSON.parse(JSON.stringify(obj))
 }
-var uid = function(){
+function uid(){
     var randomStrLength = Math.floor(Math.random() * 10) + 5,
     pool = 'abcdefghijklmnopqrstuvwxyz1234567890',
     randomStr = '';
@@ -96,4 +98,15 @@ var uid = function(){
     }
     
     return "uid_" + randomStr;
+}
+function debug(message)
+{
+    if (debug == true)
+    {
+        console.log(message)
+    }
+}
+function log(message)
+{
+    console.log(message)
 }

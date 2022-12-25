@@ -26,6 +26,22 @@ function cosineSimilarity(a, b)
     return similarity
 }
 
+function euclideanDistance(a, b)
+{
+    if (a.length != b.length) 
+    {
+        alert("wrong vector sizes!")
+        return
+    }
+    var values = 0
+    for (let i = 0; i < a.length; a++)
+    {
+        var value = Math.pow(a[i] - b[i], 2)
+        values += value
+    }
+    return 1000 / Math.sqrt(values)
+}
+
 
 const vector_columns_muse = [
     "Delta_TP9", "Theta_TP9", "Alpha_TP9", "Beta_TP9", "Gamma_TP9",
@@ -51,15 +67,15 @@ function getRootVectorMindLink(row) {
     return data
 }
 
-function getRelativeVector(row) {
+function getRelativeVector(rawVector) {
 
     var vector
     switch (standardizeType) {
         case "raw":
-            vector = vectorRaw(row) // don't standardize at all - use raw values for each band+channel
+            vector = vectorRaw(rawVector) // don't standardize at all - use raw values for each band+channel
             break;
         case "ratio":
-            vector = vectorRatio(row) // standardize by dividing each band by tp10/tp9 and af7/af8, etc
+            vector = vectorRatio(rawVector) // standardize by dividing each band by tp10/tp9 and af7/af8, etc
             break;
 
     }
@@ -68,7 +84,7 @@ function getRelativeVector(row) {
 
 }
 function vectorRaw(row) {
-
+    
     var vector = []
 
     channels.forEach(channel => {
@@ -99,16 +115,21 @@ function vectorRatio(row) {
 
 
 
+
     }
 
     function ratioMindLink() {
-        var numerators = ["delta", "theta", "alphaLow", "alphaHigh", "betaLow", "betaHigh"]
-        var denoms = ["gammaLow", "gammaMid"]
-
-        numerators.forEach(numer => {
+        var numers = ["delta", "theta", "alphaLow", "alphaHigh", "betaLow", "betaHigh",]
+        var denoms = [ "gammaLow", "gammaMid"]
+        
+        numers.forEach(numer => {
             denoms.forEach(denom => {
-                var r = ratio(row[numer], row[denom])
-                vector.push(r)
+                if (numer != denom)
+                {
+                    var r = ratio(row[numer], row[denom])
+                    vector.push(r)
+                }
+                
             })
         })
     }

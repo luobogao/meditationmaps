@@ -1,4 +1,25 @@
 
+  function addCheckbox(div, name, checked) {
+    var checkboxDiv = div.append("div")
+        .style("font-size", "30px")
+        .style("margin", "8px")
+
+    
+    var checkbox = checkboxDiv.append("input")
+        .attr("type", "checkbox")
+        .style("width", "20px")
+        .style("height", "20px")
+        .style("accent-color", "lightgreen")
+        .style("opacity", 0.7)
+        .property("checked", checked)
+        
+
+    checkboxDiv.append("label")
+        .text(name)
+
+    return checkbox
+
+}
 function popUp(event, html) {
     var x = event.pageX
     var y = event.pageY
@@ -26,6 +47,14 @@ function clickDiscord() {
 }
 function clickGithub() {
     openLink("https://github.com/luobogao/meditationmaps")
+}
+function clickContribute()
+{
+
+}
+function clickDatasets()
+{
+
 }
 function openLink(url) {
     window.open(

@@ -12,26 +12,45 @@
 <body>
 
   <div id="mySidebar" class="sidebar">
-    <h2 style="text-align: center;">Meditation Maps</h2>
-    <p style="text-align:center">Upload a Muse CSV to see your meditation journey through mind-space</p>
+    <h1 style="text-align: center;">The Mapping Meditation Project</h1>
+    <div class="subtitle" style="text-align: center; ">100% Free and Open-Source</div>
+    <div class="subtitle" style="text-align: center; margin-top: 5px">Dedicated to All Sentient Beings</div>
+    <p style="text-align:center; margin-top:40px">Upload a Muse CSV to see your meditation journey through mind-space
+    </p>
     <div id="browse-div" style="display: flex; justify-content: center;"></div>
     <div id="loading-div"></div>
     <div id="options" style="margin-top: 100px;">
       <div>
-
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
       </div>
-      <a href="#">Tutorial</a>
-      <div class="logos">
-        <img style="height:20px" src="assets/discord.png"></img>
-        <a onclick="clickDiscord()">Discord</a>
-      </div>
-      <div class="logos">
-        <img style="height:25px" src="assets/github.png"></img>
-        <a onclick="clickGithub()">Github</a>
-      </div>
+      <table>
+        <tr class="logos">
+          <td style="text-align: center"><img style="height:20px" src="assets/youtube.png"></img></td>
+          <td><a href="#">Tutorial</a></td>
+        </tr>
+        <tr class="logos">
+          <td style="text-align: center"><img style="height:20px" src="assets/discord.png"></img></td>
+          <td><a onclick="clickDiscord()">Discord</a></td>
+        </tr>
+        <tr class="logos">
+          <td style="text-align: center"><img style="height:25px" src="assets/github.png"></img></td>
+          <td><a onclick="clickGithub()">Github</a></td>
+          
+        </tr>
+        <tr class="logos">
+          <td style="text-align: center"><img style="height:25px" src="assets/datasets.png"></img></td>
+          <td><a onclick="clickDatasets()">Datasets</a></td>
+          
+        </tr>
+        <tr class="logos">
+          <td style="text-align: center"><img style="height:20px" src="assets/upload.png"></img></td>
+          <td><a onclick="clickContribute()">Contribute</a></td>
+          
+        </tr>
 
-      
+      </table>
+
+
     </div>
     <p id="message1">Our goal is to collect meditation data from many experienced practitioners and make it freely
       available and useful to anyone interested in pursuing meditation</p>
@@ -45,7 +64,7 @@
   <div id="main">
     <button id="open_btn" class="openbtn" style="display:none" onclick="openNav()">☰ Open Sidebar</button>
     <svg id="chartsvg"></svg>
-    
+
 
   </div>
   <div id="sidebarRight" class="sidebarRight">
@@ -55,11 +74,11 @@
   <div id="popup" style="display:none"></div>
 
 </body>
+<script src="js/utils.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/cardchart.js"></script>
 <script src="js/minichart.js"></script>
 <script src="js/vectors.js"></script>
-<script src="js/utils.js"></script>
 <script src="js/analysis.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/code.js"></script>

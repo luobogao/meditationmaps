@@ -1,6 +1,78 @@
 // Note: when adding new category, need to setup with UIDs
 
+var node_links = 
+[
+    ["similarity_steffan_0", "similarity_steffan_1", "similarity_steffan_2", "similarity_steffan_3"]
+
+]
+
 var waypoints_mindlink = [
+    {
+        "id": "piti_aquired",
+        "user": "Kaio",
+        "label": "(Piti Aquired)",
+        "vector": {
+            "delta": 7561,
+            "theta": 9571,
+            "alphaLow": 4441.5,
+            "alphaHigh": 3900,
+            "betaLow": 3605,
+            "betaHigh": 9635,
+            "gammaLow": 6396,
+            "gammaMid": 2585
+          }
+    },
+
+    {
+        "id": "k_anapana2",
+        "user": "Kaio",
+        "label": "Anapana (0)",
+        "vector": {
+            "delta": 9891,
+            "theta": 12172,
+            "alphaLow": 5771,
+            "alphaHigh": 3953,
+            "betaLow": 4144,
+            "betaHigh": 6579.5,
+            "gammaLow": 4939,
+            "gammaMid": 1835.5
+          }
+    },
+    {
+        "id": "k_piti_absorption",
+        "user": "Kaio",
+        "label": "Piti (1)",
+        "vector": {
+            "delta": 5722,
+            "theta": 7887.5,
+            "alphaLow": 3595.5,
+            "alphaHigh": 3033,
+            "betaLow": 2978,
+            "betaHigh": 11479,
+            "gammaLow": 7711,
+            "gammaMid": 2711.5
+          }
+    },
+
+    
+]
+var unused_ml = 
+[
+    {
+        "id": "k_ml_1",
+        "user": "Kaio",
+        "label": "Anapana 1",
+        "vector": {
+            "delta": 4394,
+            "theta": 6933,
+            "alphaLow": 3009,
+            "alphaHigh": 3361,
+            "betaLow": 2516,
+            "betaHigh": 5779,
+            "gammaLow": 3843.5,
+            "gammaMid": 1677
+          }
+    },
     {
         "id": "k_ml_1",
         "user": "Kaio",
@@ -179,6 +251,34 @@ var waypoints_muse =
             }
         },
         {
+            "id": "don_starting1",
+            "label": "Starting Point",
+            "user": "Don",
+            "notes": "One example of the starting point of a meditation",
+            "vector": {
+                "Delta_TP9": 2.0527,
+                "Theta_TP9": 4.9154,
+                "Alpha_TP9": 15.7576,
+                "Beta_TP9": 3.2506,
+                "Gamma_TP9": 0.4512,
+                "Delta_TP10": 2.5665,
+                "Theta_TP10": 5.9897,
+                "Alpha_TP10": 19.0842,
+                "Beta_TP10": 3.6704,
+                "Gamma_TP10": 0.5025,
+                "Delta_AF7": 1.1997,
+                "Theta_AF7": 0.9547,
+                "Alpha_AF7": 1.8981,
+                "Beta_AF7": 1.1054,
+                "Gamma_AF7": 0.3748,
+                "Delta_AF8": 1.3069,
+                "Theta_AF8": 0.9082,
+                "Alpha_AF8": 1.8501,
+                "Beta_AF8": 1.0498,
+                "Gamma_AF8": 0.3326
+              }
+        },
+        {
             "id": "similarity_don_best_1",
             "label": "Long-Form - 1",
             "user": "Don",
@@ -264,7 +364,7 @@ var waypoints_muse =
         },
 
         {
-            "id": "similarity_steffan_nondual",
+            "id": "similarity_steffan_3",
             "label": "Non-Dual",
             "exclude": true,
             "user": "Steffan",
@@ -549,7 +649,7 @@ var waypoints_muse =
               }
         },
         {
-            "id": "similarity_steffan_insight",
+            "id": "similarity_steffan_2",
             "label": "Insight",
             "user": "Steffan",
             "vector": {
@@ -576,7 +676,7 @@ var waypoints_muse =
               }
         },
         {
-            "id": "similarity_steffan_mindfulness",
+            "id": "similarity_steffan_0",
             "label": "Mindfulness",
             "user": "Steffan",
             "vector": {
@@ -604,7 +704,7 @@ var waypoints_muse =
         },
 
         {
-            "id": "similarity_steffan_jhana1",
+            "id": "similarity_steffan_1",
             "label": "1st Jhana",
             "user": "Steffan",
             "vector": {

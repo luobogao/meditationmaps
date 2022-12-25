@@ -6,7 +6,7 @@ var waypoints = waypoints_muse
 
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
-var defaultSelectedUsers = ["Steffan", "Kaio", "Nii"]
+var defaultSelectedUsers = ["Steffan", "Kaio", "Nii", "Students"]
 
 var chartMargin = 10
 
@@ -34,8 +34,6 @@ bands.forEach(band => {
 })
 const rl_pairs = [["TP10", "TP9"], ["AF8", "AF7"]]
 const fb_pairs = [["TP9", "AF7"], ["TP10", "AF8"]]
-
-
 
 var state =
 {
@@ -124,6 +122,8 @@ function rebuildChart() {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = cosineSimilarity(uservector, waypoint_vector)
+                //var distance = euclideanDistance(uservector, waypoint_vector)
+
 
                 if (id in distanceIds) {
                     // This is the best match so far
@@ -147,7 +147,7 @@ function rebuildChart() {
         var bestMatch = maxd[0]
         console.log(bestMatch)
         var bestFullMatch = waypoints.filter(e => e.id == bestMatch[0])[0]
-        
+
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
@@ -177,8 +177,12 @@ function rebuildChart() {
         var userVector = getRelativeVector(userRow.vector)
         var distances = []
         filtered_waypoints.forEach(waypoint => {
+
             var waypointVector = getRelativeVector(waypoint.vector)
+
             var distance = cosineSimilarity(userVector, waypointVector)
+            //var distance = euclideanDistance(userVector, waypointVector)            
+
             var label = waypoint.label + " (" + waypoint.user + ")"
 
             distances.push({ label: label, distance: distance, waypoint: waypoint, uid: uid() })
@@ -187,6 +191,7 @@ function rebuildChart() {
         distances.sort(function (a, b) {
             return b.distance - a.distance
         })
+
         userRow.distances = distances
 
     })
@@ -205,7 +210,8 @@ function rebuildChart() {
 
         // Update user data if loaded
         if (state.lowRes.length > 10) {
-            updateChartUser(state.lowRes)
+
+            updateChartUser(state.avg10)
             buildBandChart(state.highRes)
             buildSimilarityChart(state.modelRows)
 
@@ -213,9 +219,8 @@ function rebuildChart() {
 
 
     }
-    else 
-    {
-        buildCardChart(state.avg10)
+    else {
+        buildCardChart(state.highRes)
         buildBandChart(state.highRes)
         buildSimilarityChart(state.modelRows)
     }
@@ -301,6 +306,10 @@ function setup() {
 
     buildLoading(d3.select("#loading-div"))
 
+    d3.selectAll(".subtitle")
+        .style("font-style", "italic")
+        .style("opacity", 0.7)
+
     // Mini-graph
     d3.select("#minichart")
         .style("background-color", backgroundColor)
@@ -370,48 +379,39 @@ function buildSidebarRight() {
         .style("display", "flex")
         .style("flex-direction", "column")
 
-    function addCheckbox(name) {
-        var checkboxDiv = div.append("div")
-            .style("font-size", "30px")
-            .style("margin", "8px")
+  
+    contributors.forEach(name => {
 
         var checked = false
         if (state.model.selected_users.includes(name)) checked = true
 
-        checkboxDiv.append("input")
-            .attr("type", "checkbox")
-            .style("width", "20px")
-            .style("height", "20px")
-            .style("accent-color", "lightgreen")
-            .style("opacity", 0.7)
-            .property("checked", checked)
-            .on("click", function () {
-                const newState = this.checked
+        var checkbox = addCheckbox(div, name, checked)
+        checkbox.on("click", function () {
+            const newState = this.checked
 
-                // Add or remove a name from the "Selected Users" list
-                // This action should prompt a rebuild of the model and a redrawing of the graph
-                if (newState == true) {
-                    state.model.selected_users.push(name)
-                }
-                else {
-                    var i = state.model.selected_users.indexOf(name)
-                    if (i != -1) {
-                        state.model.selected_users.splice(i, 1)
-                    }
-
+            // Add or remove a name from the "Selected Users" list
+            // This action should prompt a rebuild of the model and a redrawing of the graph
+            if (newState == true) {
+                state.model.selected_users.push(name)
+            }
+            else {
+                var i = state.model.selected_users.indexOf(name)
+                if (i != -1) {
+                    state.model.selected_users.splice(i, 1)
                 }
 
-                rebuildChart()
+            }
 
-            })
+            rebuildChart()
 
-        checkboxDiv.append("label")
-            .text(name)
+        })
 
-    }
-    contributors.forEach(name => {
-        addCheckbox(name)
     })
+
+    var settingsDiv = d3.select("#sidebarRight")
+        .append("div")
+
+    settingsDiv.append()
 
 
 }

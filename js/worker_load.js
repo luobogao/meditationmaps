@@ -204,6 +204,7 @@ function averageRows(rows, roundN) {
     roundN = Math.round(roundN)
     if (roundN <= 1) {
         console.log("ERROR: rounding is too low, using raw rows")
+        rows.map(row => row.vector = getRootVector(row))
         return rows
     }
     else {
@@ -264,6 +265,7 @@ function averageRows(rows, roundN) {
 
 // Mind Link
 function processDataMindLink(rows) {
+    console.log("----- MINDLINK ------")
     let first_timestamp = parseInt(rows[0].timestampMs)
     let f = "YYYY-MM-DD HH:mm "
     let d = moment(first_timestamp).format(f)
@@ -290,6 +292,7 @@ function processDataMindLink(rows) {
 
     }
     console.log("--> Removing " + rows.filter(row => row.valid == false).length + " invalid rows")
+    
     rows = rows.filter(row => row.valid == true)
     
 
@@ -316,10 +319,14 @@ function processDataMindLink(rows) {
 }
 function averageRowsMindLink(rows, roundN) {
 
-    console.log(rows)
+    
+    roundN = Math.floor(roundN)
+    
+    
     let roundN2 = Math.round(roundN / 2)
-    if (roundN2 <= 1)
+    if (roundN2 <= 5)
     {
+        rows.map(row => row.vector = getRootVectorMindLink(row))
         return rows
     }
     let newRows = []
@@ -328,6 +335,7 @@ function averageRowsMindLink(rows, roundN) {
     var firstSeconds = rows[0].seconds
 
     for (let i = roundN2 + 1; i < rows.length - roundN2 - 5; i = i + roundN) {
+    
         let newRow = {}
         let seconds = rows[i].seconds
         let minutes = rows[i].minutes

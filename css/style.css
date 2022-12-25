@@ -7,7 +7,7 @@ body{
 }
 .sidebar {
   height: 100%;
-  width: 300px;
+  width: 350px;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -20,7 +20,7 @@ body{
 }
 .sidebarRight {
   height: 100%;
-  width: 250px;
+  width: 350px;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -33,12 +33,15 @@ body{
 }
 
 .sidebar a {
-  padding: 8px 8px 8px 32px;
+  padding: 4px 4px 4px 4px;
   text-decoration: none;
   font-size: 25px;
   color: #818181;
   display: block;
   transition: 0.3s;
+}
+.sidebar td{
+  min-width: 50px;
 }
 
 .sidebar a:hover {
