@@ -20,6 +20,7 @@ var waypointSize = 20     // Size of waypoint circles
 var userOpacity = 0.2
 var userPointColor = "grey"
 var waypointColor = "blue"
+var labelOffset = 10 // The distance of labels from points
 
 
 // 2D mode
@@ -189,11 +190,11 @@ function updateChartWaypoints() {
         var yi = entry.coordinates[1]
         var zi = entry.coordinates[2]
 
-
+        var label = entry.user + " " + entry.label
         if (entry.match == true) {
-            waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry, id: entry.id })
-            label_array.push({ x: x(xi), y: y(yi), z: z(zi), width: 10, height: 4, name: entry.user + " " + entry.label, size: entry.size })
-            anchor_array.push({ x: x(xi), y: y(yi), z: z(zi), r: waypointSize })
+            waypointCircles.push({ x: xi, y: yi, z: zi, fullentry: entry, id: entry.id, label: label})
+            
+            
         }
 
     })
@@ -203,25 +204,21 @@ function updateChartWaypoints() {
 
     // Draw labels - the first time they are drawn, there are probably bad positions and overlaps
     labels = svg.selectAll(".label")
-        .data(label_array)
+        .data(waypointCircles)
         .enter()
         .append("text")
         .attr("class", "label")
         .attr("id", function (d, i) { return "label_" + i })
         .style("fill", labelColor)
-        .attr("x", function (d, i) { return d.x + d.z })
-        .attr("y", function (d) { return d.y + d.z })
-        .attr("z", function (d) { return d.z })
+        .attr("x", function (d, i) { return x(d.xp) + labelOffset })
+        .attr("y", function (d) { return y(d.yp) - labelOffset})
+        .attr("z", function (d) { return z(d.z) })
         .style("font-size", function (d, i) {
 
-            if (mode3d == true) {
-                return Math.floor(fontScale(d.z)) + "px"
-            }
-            else return labelSize
-
+            "50px"
         })
 
-        .text(function (d) { return d.name })
+        .text(function (d) { return d.label })
 
     links = svg.selectAll(".link")
         .data(label_array)
@@ -239,7 +236,7 @@ function updateChartWaypoints() {
 
 
     if (mode3d != true) {
-        adjustLabels()
+        //adjustLabels()
     }
 
     addWaypoints(svg, waypointCircles)
@@ -619,8 +616,6 @@ function rotate(pitch, yaw, roll) {
     var transform = [[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]]
 
     rotatethis(waypointCircles, "list")
-    rotatethis(label_array, "obj")
-    rotatethis(anchor_array, "obj")
     rotatethis(waypointLinks, "link")
 
     if (userCircles.length > 0) {
@@ -777,18 +772,15 @@ function readjustAllPoints(duration) {
         svg.selectAll("." + classname)
             .transition()
             .attr("x", function (d) {
-                return d.x + d.z
+                return x(d.xp) + labelOffset
             })
             .attr("y", function (d) {
-                return d.y - d.z
+                return y(d.yp) - labelOffset
             })
    
             .style("font-size", function (d, i) {
 
-                if (mode3d == true) {
-                    return Math.floor(fontScale(d.z)) + "px"
-                }
-                else return labelSize
+                return "25px"
             })
             .style("opacity", function (d) {
                 var opacity = opacityText(z(d.z))
