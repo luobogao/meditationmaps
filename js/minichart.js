@@ -82,7 +82,7 @@ function buildSimilarityChart(userData) {
         chartType: "linear",
         yAxis:
         {
-            yMin: 10,
+            yMin: 0,
             yMax: 100,
         },
 

@@ -7,6 +7,7 @@ var waypoints = waypoints_muse
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
 var defaultSelectedUsers = ["Steffan", "Kaio", "Nii", "Students"]
+var excludeWaypoints = ["similarity_nii_selfinquiry", "similarity_nii_lettinggo", "similarity_steffan_1"]
 
 var chartMargin = 10
 
@@ -96,7 +97,7 @@ function rebuildChart() {
     d3.select("#browse-div").style("display", "flex")
 
 
-    var waypoints_include = waypoints //.filter(e => e.exclude != true) // remove manually excluded vectors
+    var waypoints_include = waypoints.filter(e => !excludeWaypoints.includes(e.id)) //.filter(e => e.exclude != true) // remove manually excluded vectors
     var filtered_waypoints_match = waypoints_include
 
     // If user data has been uploaded, use it to find waypoints that don't have a good match, and remove them
@@ -121,8 +122,8 @@ function rebuildChart() {
             waypoints.forEach(waypoint => {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
-                var distance = cosineSimilarity(uservector, waypoint_vector)
-                //var distance = euclideanDistance(uservector, waypoint_vector)
+                var distance = measureDistance(uservector, waypoint_vector)
+                
 
 
                 if (id in distanceIds) {
@@ -143,9 +144,9 @@ function rebuildChart() {
         maxd.sort(function (a, b) {
             return b[1] - a[1]
         })
-        console.log("Best Match:")
+        //console.log("Best Match:")
         var bestMatch = maxd[0]
-        console.log(bestMatch)
+        //console.log(bestMatch)
         var bestFullMatch = waypoints.filter(e => e.id == bestMatch[0])[0]
 
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
@@ -180,8 +181,8 @@ function rebuildChart() {
 
             var waypointVector = getRelativeVector(waypoint.vector)
 
-            var distance = cosineSimilarity(userVector, waypointVector)
-            //var distance = euclideanDistance(userVector, waypointVector)            
+            var distance = measureDistance(userVector, waypointVector)
+            
 
             var label = waypoint.label + " (" + waypoint.user + ")"
 
@@ -196,11 +197,6 @@ function rebuildChart() {
 
     })
 
-
-
-    // Build model        
-    var selected_waypoint_vectors = filtered_waypoints.map(e => getRelativeVector(e.vector))
-    buildModel(selected_waypoint_vectors)
 
     // Charts
 

@@ -12,9 +12,23 @@ function dot(a, b)
 var means = []
 var maxes = []
 var principals = []
-var modelType = "cosine" // How to measure variances
+var modelType = "covariance" // How to measure variances
 var standardizeType = "ratio" // Method to standardize a vector
+var distanceType = "euclidean"
 
+
+function measureDistance(a, b)
+{
+    switch (distanceType)
+    {
+        case "euclidean":
+            return euclideanDistance(a, b)
+            break;
+        case "cosine":
+            return cosineSimilarity(a, b)
+            break;
+    }
+}
 function cosineSimilarity(a, b)
 // Cosine Similarity - used to find how similar to high-dimensional vectors are to each other
 // Different from Eucleadean distance because it cares more about direction than magnitude
@@ -39,7 +53,8 @@ function euclideanDistance(a, b)
         var value = Math.pow(a[i] - b[i], 2)
         values += value
     }
-    return 1000 / Math.sqrt(values)
+    console.log(Math.sqrt(values))
+    return 20 / Math.sqrt(values)
 }
 
 
@@ -180,19 +195,19 @@ function subtract_means(matrix)
 // required for PCA analysis, this standardizes rows prior to variance
 {
 
-    // var mean_subtracted_matrix = []
-    // for (var r = 0; r < matrix.length; r++) {
-    //     var row = matrix[r]
-    //     var new_row = []
-    //     for (var c = 0; c < row.length; c++) {
-    //         var new_value = row[c] - means[c]
-    //         new_row.push(new_value)
-    //     }
-    //     mean_subtracted_matrix.push(new_row)
-    // }
-    // return mean_subtracted_matrix
+    var mean_subtracted_matrix = []
+    for (var r = 0; r < matrix.length; r++) {
+        var row = matrix[r]
+        var new_row = []
+        for (var c = 0; c < row.length; c++) {
+            var new_value = row[c] - means[c]
+            new_row.push(new_value)
+        }
+        mean_subtracted_matrix.push(new_row)
+    }
+    return mean_subtracted_matrix
 
-    return matrix
+ 
 
 }
 function unit_scaling(matrix) {
@@ -319,9 +334,10 @@ function runModel(rows)
 // Returns a list of x-y points, the location on 2-d space for each of those vectors
 
 {
-    var d = prepareDataset(rows)
-
+    var d = prepareDataset(rows)    
+    
     var mappedCoordinates = math.transpose(math.multiply(principals, d))
+    
     return mappedCoordinates
 }
 

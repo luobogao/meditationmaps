@@ -2,7 +2,9 @@
 
 var node_links = 
 [
-    ["similarity_steffan_0", "similarity_steffan_1", "similarity_steffan_2", "similarity_steffan_3"]
+    //["similarity_steffan_0", "similarity_steffan_1", "similarity_steffan_2"],
+    ["similarity_nii_mantra", "similarity_nii_lettinggo", "similarity_nii_selfinquiry"]
+    //["similarity_steffan_0", "similarity_nii_sleepy"]
 
 ]
 
@@ -139,30 +141,30 @@ var waypoints_muse =
 
     [
         {
-            "id": "similarities_nii_sleepy",
+            "id": "similarity_nii_sleepy",
             "user": "Nii",
             "label": "Sleepiness",
             "vector": {
-                "Delta_TP9": 2.2855,
-                "Theta_TP9": 2.4239,
-                "Alpha_TP9": 4.0585,
-                "Beta_TP9": 2.3156,
-                "Gamma_TP9": 0.5112,
-                "Delta_TP10": 2.0271,
-                "Theta_TP10": 2.2611,
-                "Alpha_TP10": 4.3803,
-                "Beta_TP10": 2.5506,
-                "Gamma_TP10": 0.6552,
-                "Delta_AF7": 0.8631,
-                "Theta_AF7": 0.6499,
-                "Alpha_AF7": 1.2579,
-                "Beta_AF7": 0.7707,
-                "Gamma_AF7": 0.3041,
-                "Delta_AF8": 0.7757,
-                "Theta_AF8": 0.6988,
-                "Alpha_AF8": 1.1929,
-                "Beta_AF8": 0.9591,
-                "Gamma_AF8": 0.3522
+                "Delta_TP9": 1.9593,
+                "Theta_TP9": 2.4083,
+                "Alpha_TP9": 3.7697,
+                "Beta_TP9": 2.2138,
+                "Gamma_TP9": 0.5709,
+                "Delta_TP10": 1.624,
+                "Theta_TP10": 2.3053,
+                "Alpha_TP10": 6.1098,
+                "Beta_TP10": 2.2291,
+                "Gamma_TP10": 0.7578,
+                "Delta_AF7": 0.7248,
+                "Theta_AF7": 0.7469,
+                "Alpha_AF7": 1.3792,
+                "Beta_AF7": 0.7879,
+                "Gamma_AF7": 0.2956,
+                "Delta_AF8": 0.7016,
+                "Theta_AF8": 0.6227,
+                "Alpha_AF8": 1.084,
+                "Beta_AF8": 0.7462,
+                "Gamma_AF8": 0.3409
               }
         },
         {
@@ -539,7 +541,7 @@ var waypoints_muse =
               }
         },
         {
-            "id": "similarity_nii_biaural",
+            "id": "similarity_nii_focus",
             "user": "Nii",
             "label": "Focus",
             "vector": {
@@ -677,7 +679,7 @@ var waypoints_muse =
         },
         {
             "id": "similarity_steffan_0",
-            "label": "Mindfulness",
+            "label": "Sleepiness",
             "user": "Steffan",
             "vector": {
                 "Delta_TP9": 2.2266,

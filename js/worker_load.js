@@ -202,7 +202,7 @@ function averageRows(rows, roundN) {
 
     console.log("----> Rounding with " + roundN + " in " + rows.length + " rows")
     roundN = Math.round(roundN)
-    if (roundN <= 1) {
+    if (roundN <= 2) {
         console.log("ERROR: rounding is too low, using raw rows")
         rows.map(row => row.vector = getRootVector(row))
         return rows
