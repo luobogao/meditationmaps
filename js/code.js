@@ -95,7 +95,8 @@ function rebuildChart() {
 
     d3.select("#loader").style("display", "none")
     d3.select("#browse-div").style("display", "flex")
-
+    console.log("low res:")
+    console.log(state.lowRes)
 
     var waypoints_include = waypoints.filter(e => !excludeWaypoints.includes(e.id)) //.filter(e => e.exclude != true) // remove manually excluded vectors
     var filtered_waypoints_match = waypoints_include
@@ -173,7 +174,7 @@ function rebuildChart() {
     })
 
     // Add distance to each user's rows
-    state.modelRows = state.lowRes // Use a highly averaged dataset to check for matches
+    state.modelRows = state.avg10 // Use a highly averaged dataset to check for matches
     state.modelRows.forEach(userRow => {
         var userVector = getRelativeVector(userRow.vector)
         var distances = []

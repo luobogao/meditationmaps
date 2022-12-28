@@ -16,13 +16,13 @@ var labels, links
 var linkSize = 1
 var labelSize = "20px"
 var labelColor = "black"
-var userSize = 20
-var waypointSize = 5     // Size of waypoint circles
-var userOpacity = 0.4
+var userSize = 30
+var waypointSize = 15    // Size of waypoint circles
+var userOpacity = 0.2
 var waypointOpacity = 0.9
 var userPointColor = "grey"
 var waypointColor = "blue"
-var labelOffset = 10 // The distance of labels from points
+var labelOffset = 15 // The distance of labels from points
 
 
 // Modes
@@ -251,9 +251,9 @@ function updateChartWaypoints() {
     buildLinks(svg, waypointCircles)
     addWaypoints(svg, waypointCircles)
     
-    //rotate(Math.random(), 0, Math.random())
+    rotate(Math.random(), 0, Math.random())
     rotateOpening = setInterval(function () {
-        //rotate(0.001, 0, 0.001)
+        rotate(0.001, 0, 0.001)
     }, 10)
 
 }
