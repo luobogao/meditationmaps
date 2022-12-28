@@ -3,6 +3,7 @@ var line = d3.line()
     .x(function (d, i) { return x(d[0]); })
     .y(function (d, i) { return y(d[1]) })
 //.curve(d3.curveMonotoneX) // apply smoothing to the line
+var loaded = false
 
 var rotateOpening // an 'interval' which rotates the chart when user starts
 var waypointCircles = []
@@ -250,11 +251,16 @@ function updateChartWaypoints() {
 
     buildLinks(svg, waypointCircles)
     addWaypoints(svg, waypointCircles)
-    
-    rotate(Math.random(), 0, Math.random())
-    rotateOpening = setInterval(function () {
-        rotate(0.001, 0, 0.001)
-    }, 10)
+
+    if (loaded == false) {
+        loaded = true
+        rotate(Math.random(), 0, Math.random())
+        rotateOpening = setInterval(function () {
+            rotate(0.001, 0, 0.001)
+        }, 10)
+
+    }
+
 
 }
 function addWaypoints(svg, data) {
@@ -377,7 +383,7 @@ function buildLinks(svg, waypointData) {
         all_nodes.forEach(waypoint_id => {
             var w1 = getWaypoint(waypoint_id)
             if (w1 != null) {
-                waypointLinks.push([w1, {x: 0, y:0, z: 0}])
+                waypointLinks.push([w1, { x: 0, y: 0, z: 0 }])
             }
 
         })
@@ -526,7 +532,7 @@ function updateChartUser(data, type) {
     svg.selectAll("*").remove() // Clear last chart, if any
 
     var vectors = data.map(e => getRelativeVector(e.vector))
-    
+
     // FOR TESTING: use the waypoints as user point, they should match PERFECTLY with waypoinst
     //var vectors = waypoints.filter(e => e.match == true).map(e => getRelativeVector(e.vector))
 
@@ -598,7 +604,7 @@ function updateChartUser(data, type) {
 
                     var marker_y = 50
                     var marker_x = x_mini(match.seconds)
-                    
+
 
                     d3.select("#mini-marker")
                         .attr("cx", marker_x)
@@ -677,7 +683,7 @@ function rotate(pitch, yaw, roll) {
     var transform = [[Axx, Axy, Axz], [Ayx, Ayy, Ayz], [Azx, Azy, Azz]]
 
     rotatethis(waypointCircles, "list", "waypoints")
-    
+
     if (userCircles.length > 0) {
         rotatethis(userCircles, "list", "test")
     }
@@ -688,14 +694,14 @@ function rotate(pitch, yaw, roll) {
             var m2 = math.multiply(m, transform)
             for (let e = 0; e < m2.length; e++) {
 
-              
+
                 matrix[e].x = m2[e][0]
                 matrix[e].y = m2[e][1]
                 matrix[e].z = m2[e][2]
             }
-            
-            
-            
+
+
+
 
 
         }
@@ -758,7 +764,7 @@ function recenter(node, duration) {
     var z = node.z
     // Centers the view around the user's data center of gravity instead of the model origin
 
-    
+
 
     var updates = [userCircles, waypointCircles]
     updates.forEach(arr => {

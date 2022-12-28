@@ -4,6 +4,7 @@ var backgroundColor = "#d9d9d9"
 var sidebarWidth = 300
 var waypoints = waypoints_muse
 
+
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
 var defaultSelectedUsers = ["Steffan", "Kaio", "Nii", "Students"]
@@ -206,7 +207,7 @@ function rebuildChart() {
         updateChartWaypoints()
 
         // Update user data if loaded
-        if (state.lowRes.length > 10) {
+        if (state.avg10.length > 5) {
 
             updateChartUser(state.highRes)
             buildBandChart(state.highRes)
