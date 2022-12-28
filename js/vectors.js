@@ -60,6 +60,33 @@ var waypoints_mindlink = [
 ]
 var unused_ml =
     [
+        {
+            "id": "similarity_steffan_0",
+            "label": "Restless",
+            "user": "Steffan",
+            "vector": {
+                "Delta_TP9": 2.0095,
+                "Theta_TP9": 1.9463,
+                "Alpha_TP9": 4.6267,
+                "Beta_TP9": 1.6824,
+                "Gamma_TP9": 0.6288,
+                "Delta_TP10": 2.0711,
+                "Theta_TP10": 1.5905,
+                "Alpha_TP10": 4.1803,
+                "Beta_TP10": 1.386,
+                "Gamma_TP10": 0.5892,
+                "Delta_AF7": 1.9312,
+                "Theta_AF7": 1.1721,
+                "Alpha_AF7": 1.5164,
+                "Beta_AF7": 0.7959,
+                "Gamma_AF7": 0.3405,
+                "Delta_AF8": 1.4232,
+                "Theta_AF8": 0.8058,
+                "Alpha_AF8": 1.386,
+                "Beta_AF8": 0.7989,
+                "Gamma_AF8": 0.3129
+              }
+        },
         
         {
             "id": "k_ml_1",
@@ -171,26 +198,26 @@ var waypoints_muse =
         "user": "Soshant",
         "label": "Restless",
         "vector": {
-            "Delta_TP9": 1.709,
-            "Theta_TP9": 1.5873,
-            "Alpha_TP9": 4.0394,
-            "Beta_TP9": 6.2967,
-            "Gamma_TP9": 3.933,
-            "Delta_TP10": 1.4998,
-            "Theta_TP10": 1.4103,
-            "Alpha_TP10": 3.9841,
-            "Beta_TP10": 6.535,
-            "Gamma_TP10": 4.3584,
-            "Delta_AF7": 0.9681,
-            "Theta_AF7": 0.8034,
-            "Alpha_AF7": 2.1441,
-            "Beta_AF7": 11.6113,
-            "Gamma_AF7": 10.3765,
-            "Delta_AF8": 0.9875,
-            "Theta_AF8": 0.7776,
-            "Alpha_AF8": 1.9311,
-            "Beta_AF8": 6.1255,
-            "Gamma_AF8": 5.1555
+            "Delta_TP9": 3.161,
+            "Theta_TP9": 2.2671,
+            "Alpha_TP9": 3.664,
+            "Beta_TP9": 3.6972,
+            "Gamma_TP9": 1.1656,
+            "Delta_TP10": 1.7517,
+            "Theta_TP10": 1.6091,
+            "Alpha_TP10": 3.3944,
+            "Beta_TP10": 2.9934,
+            "Gamma_TP10": 1.5256,
+            "Delta_AF7": 1.8325,
+            "Theta_AF7": 0.6777,
+            "Alpha_AF7": 1.3957,
+            "Beta_AF7": 1.1228,
+            "Gamma_AF7": 0.5462,
+            "Delta_AF8": 1.2291,
+            "Theta_AF8": 0.6846,
+            "Alpha_AF8": 1.8228,
+            "Beta_AF8": 2.3525,
+            "Gamma_AF8": 1.2213
           }
     },
         {
@@ -594,9 +621,9 @@ var waypoints_muse =
             }
         },
         {
-            "id": "similarity_nii_focus",
+            "id": "similarity_nii_binaural",
             "user": "Nii",
-            "label": "Focus",
+            "label": "Binaural Beats",
             "vector": {
                 "Delta_TP9": 1.8505,
                 "Theta_TP9": 4.2806,
@@ -730,33 +757,7 @@ var waypoints_muse =
                 "Gamma_AF8": 0.3958
             }
         },
-        {
-            "id": "similarity_steffan_0",
-            "label": "Sleepiness",
-            "user": "Steffan",
-            "vector": {
-                "Delta_TP9": 2.2266,
-                "Theta_TP9": 1.9115,
-                "Alpha_TP9": 3.5061,
-                "Beta_TP9": 2.0029,
-                "Gamma_TP9": 0.5014,
-                "Delta_TP10": 2.1239,
-                "Theta_TP10": 1.7403,
-                "Alpha_TP10": 3.2478,
-                "Beta_TP10": 1.6695,
-                "Gamma_TP10": 0.5763,
-                "Delta_AF7": 0.9139,
-                "Theta_AF7": 0.653,
-                "Alpha_AF7": 1.1158,
-                "Beta_AF7": 0.7262,
-                "Gamma_AF7": 0.3485,
-                "Delta_AF8": 0.8078,
-                "Theta_AF8": 0.586,
-                "Alpha_AF8": 1.0642,
-                "Beta_AF8": 0.6872,
-                "Gamma_AF8": 0.2943
-            }
-        },
+     
 
         {
             "id": "similarity_steffan_1",

@@ -12,7 +12,7 @@ function dot(a, b)
 var means = []
 var maxes = []
 var principals = []
-var modelType = "covariance" // How to measure variances
+var modelType = "cosine" // How to measure variances
 var standardizeType = "ratio" // Method to standardize a vector
 var distanceType = "cosine"
 

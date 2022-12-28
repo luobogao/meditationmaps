@@ -207,7 +207,7 @@ function rebuildChart() {
         // Update user data if loaded
         if (state.lowRes.length > 10) {
 
-            updateChartUser(state.lowRes)
+            updateChartUser(state.highRes)
             buildBandChart(state.highRes)
             buildSimilarityChart(state.modelRows)
 
