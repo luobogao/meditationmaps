@@ -166,7 +166,60 @@ var unused_ml =
     ]
 
 var unused_muse = [
-
+    {
+        "id": "similarity_nii_binaural",
+        "user": "Nii",
+        "label": "Binaural Beats",
+        "vector": {
+            "Delta_TP9": 1.8505,
+            "Theta_TP9": 4.2806,
+            "Alpha_TP9": 12.6758,
+            "Beta_TP9": 2.481,
+            "Gamma_TP9": 0.552,
+            "Delta_TP10": 1.5638,
+            "Theta_TP10": 3.8686,
+            "Alpha_TP10": 9.4056,
+            "Beta_TP10": 2.3955,
+            "Gamma_TP10": 0.8443,
+            "Delta_AF7": 0.5984,
+            "Theta_AF7": 0.8554,
+            "Alpha_AF7": 1.3902,
+            "Beta_AF7": 0.8076,
+            "Gamma_AF7": 0.4655,
+            "Delta_AF8": 0.4683,
+            "Theta_AF8": 0.6215,
+            "Alpha_AF8": 1.2577,
+            "Beta_AF8": 0.7196,
+            "Gamma_AF8": 0.354
+        }
+    },
+    {
+        "id": "similarity_nii_lettinggo",
+        "label": "Letting Go",
+        "user": "Nii",
+        "vector": {
+            "Delta_TP9": 2.1299,
+            "Theta_TP9": 3.3491,
+            "Alpha_TP9": 6.9262,
+            "Beta_TP9": 2.7411,
+            "Gamma_TP9": 0.6369,
+            "Delta_TP10": 1.6245,
+            "Theta_TP10": 3.4404,
+            "Alpha_TP10": 6.8603,
+            "Beta_TP10": 2.4208,
+            "Gamma_TP10": 0.8996,
+            "Delta_AF7": 0.7984,
+            "Theta_AF7": 0.8474,
+            "Alpha_AF7": 1.4823,
+            "Beta_AF7": 1.1537,
+            "Gamma_AF7": 0.4051,
+            "Delta_AF8": 1.5983,
+            "Theta_AF8": 1.1373,
+            "Alpha_AF8": 1.8958,
+            "Beta_AF8": 1.0701,
+            "Gamma_AF8": 0.3598
+        }
+    },
 
 
 ]
@@ -262,7 +315,7 @@ var waypoints_muse =
         }
     },
     {
-        "id": "similarity_steffan_3",
+        "id": "similarity_steffan_nondual",
         "label": "Non-Dual",
         "exclude": true,
         "user": "Steffan",
@@ -627,33 +680,7 @@ var waypoints_muse =
 
     },
 
-    {
-        "id": "similarity_nii_binaural",
-        "user": "Nii",
-        "label": "Binaural Beats",
-        "vector": {
-            "Delta_TP9": 1.8505,
-            "Theta_TP9": 4.2806,
-            "Alpha_TP9": 12.6758,
-            "Beta_TP9": 2.481,
-            "Gamma_TP9": 0.552,
-            "Delta_TP10": 1.5638,
-            "Theta_TP10": 3.8686,
-            "Alpha_TP10": 9.4056,
-            "Beta_TP10": 2.3955,
-            "Gamma_TP10": 0.8443,
-            "Delta_AF7": 0.5984,
-            "Theta_AF7": 0.8554,
-            "Alpha_AF7": 1.3902,
-            "Beta_AF7": 0.8076,
-            "Gamma_AF7": 0.4655,
-            "Delta_AF8": 0.4683,
-            "Theta_AF8": 0.6215,
-            "Alpha_AF8": 1.2577,
-            "Beta_AF8": 0.7196,
-            "Gamma_AF8": 0.354
-        }
-    },
+    
     {
         "id": "similarity_nii_selfinquiry",
         "label": "Self-Inquiry",
@@ -710,33 +737,7 @@ var waypoints_muse =
             "Gamma_AF8": 0.8066
         }
     },
-    {
-        "id": "similarity_nii_lettinggo",
-        "label": "Letting Go",
-        "user": "Nii",
-        "vector": {
-            "Delta_TP9": 2.1299,
-            "Theta_TP9": 3.3491,
-            "Alpha_TP9": 6.9262,
-            "Beta_TP9": 2.7411,
-            "Gamma_TP9": 0.6369,
-            "Delta_TP10": 1.6245,
-            "Theta_TP10": 3.4404,
-            "Alpha_TP10": 6.8603,
-            "Beta_TP10": 2.4208,
-            "Gamma_TP10": 0.8996,
-            "Delta_AF7": 0.7984,
-            "Theta_AF7": 0.8474,
-            "Alpha_AF7": 1.4823,
-            "Beta_AF7": 1.1537,
-            "Gamma_AF7": 0.4051,
-            "Delta_AF8": 1.5983,
-            "Theta_AF8": 1.1373,
-            "Alpha_AF8": 1.8958,
-            "Beta_AF8": 1.0701,
-            "Gamma_AF8": 0.3598
-        }
-    },
+    
     {
         "id": "similarity_steffan_2",
         "label": "Insight",

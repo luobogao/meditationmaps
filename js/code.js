@@ -8,7 +8,7 @@ var waypoints = waypoints_muse
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
 var defaultSelectedUsers = ["Steffan", "Kaio", "Nii", "Students"]
-var excludeWaypoints = [ "similarity_steffan_nondual", "similarity_kaio_fruition", "similarity_kaio_fruition2", "similarity_kaio_fruition3"]
+var excludeWaypoints = [] //[ "similarity_steffan_nondual", "similarity_kaio_fruition", "similarity_kaio_fruition2", "similarity_kaio_fruition3"]
 
 var chartMargin = 10
 
@@ -99,7 +99,7 @@ function rebuildChart() {
     console.log("low res:")
     console.log(state.lowRes)
 
-    var waypoints_include = waypoints.filter(e => !excludeWaypoints.includes(e.id)) //.filter(e => e.exclude != true) // remove manually excluded vectors
+    var waypoints_include = waypoints  //.filter(e => !excludeWaypoints.includes(e.id)) //.filter(e => e.exclude != true) // remove manually excluded vectors
     var filtered_waypoints_match = waypoints_include
 
     // If user data has been uploaded, use it to find waypoints that don't have a good match, and remove them
