@@ -8,7 +8,7 @@ var waypoints = waypoints_muse
 var chartWidth = window.innerWidth - sidebarWidth - 250
 var chartHeight = window.innerHeight
 var defaultSelectedUsers = ["Steffan", "Kaio", "Nii", "Students"]
-var excludeWaypoints = ["similarity_nii_selfinquiry", "similarity_nii_lettinggo", "similarity_steffan_1"]
+var excludeWaypoints = [ "similarity_steffan_nondual", "similarity_kaio_fruition", "similarity_kaio_fruition2", "similarity_kaio_fruition3"]
 
 var chartMargin = 10
 
@@ -125,8 +125,7 @@ function rebuildChart() {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = measureDistance(uservector, waypoint_vector)
-                
-
+            
 
                 if (id in distanceIds) {
                     // This is the best match so far
@@ -150,12 +149,14 @@ function rebuildChart() {
         var bestMatch = maxd[0]
         //console.log(bestMatch)
         var bestFullMatch = waypoints.filter(e => e.id == bestMatch[0])[0]
-
         var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
+        
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
         filtered_waypoints_match = waypoints_include.filter(e => filtered_waypoint_ids.includes(e.id))
     }
+    console.log("waypoint with distance:")
+    console.log(filtered_waypoints_match)
 
     // Remove waypoints that have been de-selected by the user
     var filtered_waypoints = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
