@@ -1,12 +1,12 @@
 // Note: when adding new category, need to setup with UIDs
 
-var node_links = 
-[
-    //["similarity_steffan_0", "similarity_steffan_1", "similarity_steffan_2"],
-    ["similarity_nii_mantra", "similarity_nii_lettinggo", "similarity_nii_selfinquiry"]
-    //["similarity_steffan_0", "similarity_nii_sleepy"]
+var node_links =
+    [
+        //["similarity_steffan_0", "similarity_steffan_1", "similarity_steffan_2"],
+        ["similarity_nii_mantra", "similarity_nii_lettinggo", "similarity_nii_selfinquiry"]
+        //["similarity_steffan_0", "similarity_nii_sleepy"]
 
-]
+    ]
 
 var waypoints_mindlink = [
     {
@@ -22,7 +22,7 @@ var waypoints_mindlink = [
             "betaHigh": 9635,
             "gammaLow": 6396,
             "gammaMid": 2585
-          }
+        }
     },
 
     {
@@ -38,7 +38,7 @@ var waypoints_mindlink = [
             "betaHigh": 6579.5,
             "gammaLow": 4939,
             "gammaMid": 1835.5
-          }
+        }
     },
     {
         "id": "k_piti_absorption",
@@ -53,93 +53,146 @@ var waypoints_mindlink = [
             "betaHigh": 11479,
             "gammaLow": 7711,
             "gammaMid": 2711.5
-          }
+        }
     },
 
-    
+
 ]
-var unused_ml = 
-[
-    {
-        "id": "k_ml_1",
-        "user": "Kaio",
-        "label": "Anapana 1",
-        "vector": {
-            "delta": 4394,
-            "theta": 6933,
-            "alphaLow": 3009,
-            "alphaHigh": 3361,
-            "betaLow": 2516,
-            "betaHigh": 5779,
-            "gammaLow": 3843.5,
-            "gammaMid": 1677
-          }
-    },
-    {
-        "id": "k_ml_1",
-        "user": "Kaio",
-        "label": "Anapana 1",
-        "vector": {
-            "delta": 6154,
-            "theta": 8035,
-            "alphaLow": 4025,
-            "alphaHigh": 3078,
-            "betaLow": 2711,
-            "betaHigh": 5337.5,
-            "gammaLow": 3456,
-            "gammaMid": 1673.5
-          }
-    },
-    {
-        "id": "k_ml_2",
-        "user": "Kaio",
-        "label": "Anapana 2",
-        "vector": {
-            "delta": 7515,
-            "theta": 9603.5,
-            "alphaLow": 3734,
-            "alphaHigh": 4162,
-            "betaLow": 3717.5,
-            "betaHigh": 8795,
-            "gammaLow": 7279,
-            "gammaMid": 2687.5
-          }
-    },
-    {
-        "id": "k_ml_3",
-        "user": "Kaio",
-        "label": "Anapana 3",
-        "vector": {
-            "delta": 4527.5,
-            "theta": 6933,
-            "alphaLow": 3391.5,
-            "alphaHigh": 3241,
-            "betaLow": 2404,
-            "betaHigh": 5431,
-            "gammaLow": 4292.5,
-            "gammaMid": 1684
-          }
-    },
-    {
-        "id": "k_ml_4",
-        "user": "Kaio",
-        "label": "Anapana 4",
-        "vector": {
-            "delta": 10968.5,
-            "theta": 10000,
-            "alphaLow": 5039,
-            "alphaHigh": 3983,
-            "betaLow": 4104,
-            "betaHigh": 7892,
-            "gammaLow": 5473.5,
-            "gammaMid": 2602
-          }
-    },
-]
+var unused_ml =
+    [
+        
+        {
+            "id": "k_ml_1",
+            "user": "Kaio",
+            "label": "Anapana 1",
+            "vector": {
+                "delta": 4394,
+                "theta": 6933,
+                "alphaLow": 3009,
+                "alphaHigh": 3361,
+                "betaLow": 2516,
+                "betaHigh": 5779,
+                "gammaLow": 3843.5,
+                "gammaMid": 1677
+            }
+        },
+        {
+            "id": "k_ml_1",
+            "user": "Kaio",
+            "label": "Anapana 1",
+            "vector": {
+                "delta": 6154,
+                "theta": 8035,
+                "alphaLow": 4025,
+                "alphaHigh": 3078,
+                "betaLow": 2711,
+                "betaHigh": 5337.5,
+                "gammaLow": 3456,
+                "gammaMid": 1673.5
+            }
+        },
+        {
+            "id": "k_ml_2",
+            "user": "Kaio",
+            "label": "Anapana 2",
+            "vector": {
+                "delta": 7515,
+                "theta": 9603.5,
+                "alphaLow": 3734,
+                "alphaHigh": 4162,
+                "betaLow": 3717.5,
+                "betaHigh": 8795,
+                "gammaLow": 7279,
+                "gammaMid": 2687.5
+            }
+        },
+        {
+            "id": "k_ml_3",
+            "user": "Kaio",
+            "label": "Anapana 3",
+            "vector": {
+                "delta": 4527.5,
+                "theta": 6933,
+                "alphaLow": 3391.5,
+                "alphaHigh": 3241,
+                "betaLow": 2404,
+                "betaHigh": 5431,
+                "gammaLow": 4292.5,
+                "gammaMid": 1684
+            }
+        },
+        {
+            "id": "k_ml_4",
+            "user": "Kaio",
+            "label": "Anapana 4",
+            "vector": {
+                "delta": 10968.5,
+                "theta": 10000,
+                "alphaLow": 5039,
+                "alphaHigh": 3983,
+                "betaLow": 4104,
+                "betaHigh": 7892,
+                "gammaLow": 5473.5,
+                "gammaMid": 2602
+            }
+        },
+    ]
 
 var waypoints_muse =
 
-    [
+    [{
+        "id": "so_mantra_1",
+        "user": "Soshant",
+        "label": "Bhakti",
+        "vector": {
+            "Delta_TP9": 1.6147,
+            "Theta_TP9": 1.9521,
+            "Alpha_TP9": 8.6142,
+            "Beta_TP9": 16.0715,
+            "Gamma_TP9": 15.6153,
+            "Delta_TP10": 1.5005,
+            "Theta_TP10": 1.4887,
+            "Alpha_TP10": 3.9979,
+            "Beta_TP10": 9.9482,
+            "Gamma_TP10": 10.5513,
+            "Delta_AF7": 1.0865,
+            "Theta_AF7": 0.9092,
+            "Alpha_AF7": 2.086,
+            "Beta_AF7": 11.1645,
+            "Gamma_AF7": 11.7744,
+            "Delta_AF8": 0.9571,
+            "Theta_AF8": 0.9303,
+            "Alpha_AF8": 2.1021,
+            "Beta_AF8": 8.0495,
+            "Gamma_AF8": 8.4717
+          }
+    },{
+        "id": "so_mantra_0",
+        "user": "Soshant",
+        "label": "Restless",
+        "vector": {
+            "Delta_TP9": 1.709,
+            "Theta_TP9": 1.5873,
+            "Alpha_TP9": 4.0394,
+            "Beta_TP9": 6.2967,
+            "Gamma_TP9": 3.933,
+            "Delta_TP10": 1.4998,
+            "Theta_TP10": 1.4103,
+            "Alpha_TP10": 3.9841,
+            "Beta_TP10": 6.535,
+            "Gamma_TP10": 4.3584,
+            "Delta_AF7": 0.9681,
+            "Theta_AF7": 0.8034,
+            "Alpha_AF7": 2.1441,
+            "Beta_AF7": 11.6113,
+            "Gamma_AF7": 10.3765,
+            "Delta_AF8": 0.9875,
+            "Theta_AF8": 0.7776,
+            "Alpha_AF8": 1.9311,
+            "Beta_AF8": 6.1255,
+            "Gamma_AF8": 5.1555
+          }
+    },
         {
             "id": "similarity_nii_sleepy",
             "user": "Nii",
@@ -165,7 +218,7 @@ var waypoints_muse =
                 "Alpha_AF8": 1.084,
                 "Beta_AF8": 0.7462,
                 "Gamma_AF8": 0.3409
-              }
+            }
         },
         {
             "id": "similarities_parks_mindfulness",
@@ -278,7 +331,7 @@ var waypoints_muse =
                 "Alpha_AF8": 1.8501,
                 "Beta_AF8": 1.0498,
                 "Gamma_AF8": 0.3326
-              }
+            }
         },
         {
             "id": "similarity_don_best_1",
@@ -391,7 +444,7 @@ var waypoints_muse =
                 "Alpha_AF8": 1.1662,
                 "Beta_AF8": 0.6764,
                 "Gamma_AF8": 0.4368
-              }
+            }
         },
 
 
@@ -538,7 +591,7 @@ var waypoints_muse =
                 "Alpha_AF8": 0.6407,
                 "Beta_AF8": 1.3066,
                 "Gamma_AF8": 1.6651
-              }
+            }
         },
         {
             "id": "similarity_nii_focus",
@@ -648,7 +701,7 @@ var waypoints_muse =
                 "Alpha_AF8": 1.8958,
                 "Beta_AF8": 1.0701,
                 "Gamma_AF8": 0.3598
-              }
+            }
         },
         {
             "id": "similarity_steffan_2",
@@ -675,7 +728,7 @@ var waypoints_muse =
                 "Alpha_AF8": 1.036,
                 "Beta_AF8": 0.6748,
                 "Gamma_AF8": 0.3958
-              }
+            }
         },
         {
             "id": "similarity_steffan_0",

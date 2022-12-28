@@ -14,7 +14,7 @@ var maxes = []
 var principals = []
 var modelType = "covariance" // How to measure variances
 var standardizeType = "ratio" // Method to standardize a vector
-var distanceType = "euclidean"
+var distanceType = "cosine"
 
 
 function measureDistance(a, b)
@@ -120,6 +120,7 @@ function vectorRatio(row) {
 
         let bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
         var ratios = [["TP10", "TP9"], ["AF8", "AF7"], ["TP10", "AF8"], ["TP9", "AF7"]]
+        //var ratios = [["TP10", "TP9"], ["AF8", "AF7"]]
         bands.forEach(band => {
             ratios.forEach(ratio_keys => {
                 var value = ratio(row[band + "_" + ratio_keys[0]], row[band + "_" + ratio_keys[1]])
@@ -206,6 +207,7 @@ function subtract_means(matrix)
         mean_subtracted_matrix.push(new_row)
     }
     return mean_subtracted_matrix
+    
 
  
 

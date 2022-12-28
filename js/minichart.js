@@ -79,16 +79,16 @@ function buildSimilarityChart(userData) {
         data: data,
         firstX: userData[0].firstSeconds,
         svgId: "matchchartid",
-        chartType: "linear",
+        chartType: "log",
         yAxis:
         {
-            yMin: 0,
+            yMin: 50,
             yMax: 100,
         },
 
         interactionType: "highlight",
         lineWidth: 3,
-        resolution: 50,
+        resolution: 20,
         size:
         {
             width: matchchartWidth,
