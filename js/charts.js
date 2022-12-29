@@ -17,7 +17,7 @@ var labels, links
 var linkSize = 1
 var labelSize = "20px"
 var labelColor = "black"
-var userSize = 30
+var userSize = 40
 var waypointSize = 15    // Size of waypoint circles
 var userOpacity = 0.2
 var waypointOpacity = 0.9

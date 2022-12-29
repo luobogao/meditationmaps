@@ -100,7 +100,7 @@ function rebuildChart() {
     console.log(state.lowRes)
 
     var waypoints_include = waypoints  //.filter(e => !excludeWaypoints.includes(e.id)) //.filter(e => e.exclude != true) // remove manually excluded vectors
-    var filtered_waypoints_match = waypoints_include
+    var filtered_waypoints_match = waypoints_include.filter(e => state.model.selected_users.includes(e.user))
 
     // If user data has been uploaded, use it to find waypoints that don't have a good match, and remove them
     if (state.avg10.length > 0) {
@@ -121,11 +121,11 @@ function rebuildChart() {
         var distanceIds = {}
         userVectors.forEach(uservector => {
 
-            waypoints.forEach(waypoint => {
+            filtered_waypoints_match.forEach(waypoint => {
                 var waypoint_vector = getRelativeVector(waypoint.vector)
                 var id = waypoint.id
                 var distance = measureDistance(uservector, waypoint_vector)
-            
+
 
                 if (id in distanceIds) {
                     // This is the best match so far
@@ -149,8 +149,8 @@ function rebuildChart() {
         var bestMatch = maxd[0]
         //console.log(bestMatch)
         var bestFullMatch = waypoints.filter(e => e.id == bestMatch[0])[0]
-        var filtered_waypoint_ids = maxd.filter(e => e[1] > minimumMatch).map(e => e[0])
-        
+        var filtered_waypoint_ids = maxd.slice(0, 3).map(e => e[0])  //filter(e => e[1] > minimumMatch).map(e => e[0])
+
 
         // Remove waypoints that have been selected for removal by the "removeN" standard
         filtered_waypoints_match = waypoints_include.filter(e => filtered_waypoint_ids.includes(e.id))
@@ -159,7 +159,7 @@ function rebuildChart() {
     console.log(filtered_waypoints_match)
 
     // Remove waypoints that have been de-selected by the user
-    var filtered_waypoints = filtered_waypoints_match.filter(e => state.model.selected_users.includes(e.user))
+    var filtered_waypoints = filtered_waypoints_match
 
     if (filtered_waypoints.length == 0) {
         alert("zero waypoints selected!")
@@ -176,7 +176,7 @@ function rebuildChart() {
     })
 
     // Add distance to each user's rows
-    state.modelRows = state.avg10 // Use a highly averaged dataset to check for matches
+    state.modelRows = state.averageMax // Use a highly averaged dataset to check for matches
     state.modelRows.forEach(userRow => {
         var userVector = getRelativeVector(userRow.vector)
         var distances = []
@@ -185,7 +185,7 @@ function rebuildChart() {
             var waypointVector = getRelativeVector(waypoint.vector)
 
             var distance = measureDistance(userVector, waypointVector)
-            
+
 
             var label = waypoint.label + " (" + waypoint.user + ")"
 
@@ -201,6 +201,10 @@ function rebuildChart() {
     })
 
 
+    let vectors = waypoints.filter(w => w.match == true).map(e => getRelativeVector(e.vector))
+
+    buildModel(vectors)
+
     // Charts
 
     var type = "map"
@@ -210,7 +214,7 @@ function rebuildChart() {
         // Update user data if loaded
         if (state.avg10.length > 5) {
 
-            updateChartUser(state.highRes)
+            updateChartUser(state.averageMax)
             buildBandChart(state.highRes)
             buildSimilarityChart(state.modelRows)
 
@@ -378,7 +382,7 @@ function buildSidebarRight() {
         .style("display", "flex")
         .style("flex-direction", "column")
 
-  
+
     contributors.forEach(name => {
 
         var checked = false
