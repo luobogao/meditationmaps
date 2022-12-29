@@ -118,7 +118,8 @@ function vectorRatio(row) {
 
     function ratioMuse() {
 
-        let bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+        //let bands = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+        let bands = ["Delta", "Theta", "Alpha"]
         var ratios = [["TP10", "TP9"], ["AF8", "AF7"], ["TP10", "AF8"], ["TP9", "AF7"]]
         //var ratios = [["TP10", "TP9"], ["AF8", "AF7"]]
         bands.forEach(band => {
